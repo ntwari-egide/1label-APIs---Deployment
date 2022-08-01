@@ -50,7 +50,28 @@ poOrderByKeys[0]?.Price10,poOrderByKeys[0]?.currency1,poOrderByKeys[0]?.currency
 
 
 exports.GetOrderDetail = async () => {
-    
+    let orderDetail = await sequelize.query(`SELECT A.custom_number AS A_Custom_Content_Number,
+    B.custom_number AS B_Custom_Content_Number,C.custom_number AS C_Custom_Content_Number
+    ,A.style_number AS A_Content_Number_Name,
+    B.style_number AS B_Content_Number_Name,C.style_number AS C_Content_Number_Name
+    ,orders.*
+    FROM (SELECT ROW_NUMBER() over(order by orders.num) as orderID, orders.* ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref1 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key1 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref2 and (item.brandid=orders.brandid OR item.
+    brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key2 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref3 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key3 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref4 and (item.brandid=orders.
+    brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key4 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref5 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key5 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref6 and (item.
+    brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key6 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref7 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key7 ,(select guid_key from tb_item_reference item where item.item_ref=orders.
+    item_ref8 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key8 ,(select guid_key from tb_item_reference item where item.item_ref=orders.item_ref9 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key9 ,(select guid_key from tb_item_reference item where item.
+    item_ref=orders.item_ref10 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as item_guid_key10 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref1 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode1 ,(select d365itemcode from 
+    tb_item_reference item where item.item_ref=orders.item_ref2 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode2 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref3 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode3 ,
+    (select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref4 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode4 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref5 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE 
+    brand_prefix='ACD') ) ) as d365itemcode5 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref6 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode6 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref7 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM 
+    tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode7 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref8 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode8 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref9 and (item.brandid=orders.brandid OR item.brandid=
+    (SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode9 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref10 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode10 FROM tb_order_edi_temp_279 as orders 
+    WHERE orders.order_no=@order_no
+    )orders LEFT JOIN 
+    tb_Content_279 A ON A.content_key=orders.A_Content_Number
+    LEFT JOIN tb_Content_279 B ON B.content_key=orders.B_Content_Number
+    LEFT JOIN tb_Content_279 C ON C.content_key=orders.C_Content_Number
+    ORDER BY orders.order_no,orders.nu`)
    
 }
 
@@ -118,12 +139,8 @@ exports.GetPOOrderList = async(order_user, brand_key, order_date_from, order_dat
 
 
 exports.GetPOSizeTableTempList = async(brand_key, order_key, is_po_order_temp) => {
-    let tb = await sequelize.query(`SELECT brand_key=tb_order_edi.guid_key,A.id, B.TbContent,B.TbContentDtl,B.TbCareDtl,B.TbIconDtl,B.TbZContent,B.TbOrder,B.TbOrderEDI,B.TbOrderEDITemp
-    ,B.qr_tbOrderPo,B.qr_tbItemNo,B.sp_Qr,B.TbOrderSizeTableDtl --for order and content number
-    ,C.TbTranslation,C.TbSysIcon --for translation
-    FROM tb_brand A LEFT JOIN tb_DynamicTable B ON A.guid_key=B.ForeignKey AND B.SourceType='Brand'
-    LEFT JOIN tb_DynamicTable C ON A.translation_code=C.ForeignKey AND C.SourceType='Trans'
-    WHERE A.guid_key=?`, brand_key)
+    let tb = await sequelize.query(`SELECT brand_key=tb_order_edi.guid_key,A.id, B.TbContent,B.TbContentDtl,B.TbCareDtl,B.TbIconDtl,B.TbZContent,B.TbOrder,B.TbOrderEDI,B.TbOrderEDITemp
+    ,B.qr_tbOrderPo,B.qr_tbItemNo,B.sp_Qr,B.TbOrderSizeTableDtl,C.TbTranslation,C.TbSysIcon FROM tb_brand A LEFT JOIN tb_DynamicTable B ON A.guid_key=B.ForeignKey AND B.SourceType='Brand' LEFT JOIN tb_DynamicTable C ON A.translation_code=C.ForeignKey AND C.SourceType='Trans'WHERE A.guid_key=?`, brand_key)
     
     let sizeTableTempList = await sequelize.query(`select group_type=A.OptionId+','+ A.size_matrix_type1,A.order_no,option_id=A.OptionId,production_description=A Product_Description,supplier_code=A.Supplier_Code,factory_code=A.factory_code,size_matrix_type=A.size_matrix_type1, guid_key=B.GuidKey,order_key=B.OrderKey
     ,brand_key=B.BrandId,edi_order_no=B.EdiOrderNo,consolidated_id=B.ConsolidatedId,size_content=B.SizeContent,send_date=B.SendDate,create_date=B.CreateDate,B.total_qty1,B.total_qty2,B.total_qty3,B.total_qty4,B.total_qty5,B.total_qty6,B.total_qty7, B.total_qty8, B.total_qty9,B.total_qty10 from tb_AsosOrderPoSize B left join ${tb[0]?.TbOrderEDITemp}A on A.guid_key=B.OrderKey where A.order_no='?'`, order_key)
@@ -133,3 +150,12 @@ exports.GetPOSizeTableTempList = async(brand_key, order_key, is_po_order_temp) =
 
     return sizeTableTempList;
 }
+
+exports.GetMinExpectedDeliveryDate = async(brand_guid_key, item_refs, erp_id) => {
+    let minExpectedDeliveryDate = await sequelize.query(` 
+    SELECT leadtime=CASE b.itemstatus WHEN '--Select--' then MAX(a.leadtime) WHEN 'Seven' THEN CASE WHEN MAX(a.leadtime)>7 THEN MAX(a.leadtime) ELSE 7 END 
+   WHEN 'Fourteen'  THEN  CASE WHEN MAX(a.leadtime)>14 THEN MAX(a.leadtime) ELSE 14 END ELSE MAX(a.leadtime) end as leadtime FROM tb_item_reference_erp a  LEFT JOIN  tb_item_reference b  on  a.item_reference_guid_key = b.guid_key WHERE b.item_ref IN (:item_refs) AND a.erp_id =:erp_id AND  (b.brandid=:brand_guid_key)`, { replacements: { item_refs: [...item_refs], erp_id: erp_id, brand_guid_key: brand_guid_key } })
+    
+   return minExpectedDeliveryDate[0]
+}
+
