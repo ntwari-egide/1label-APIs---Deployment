@@ -6,7 +6,7 @@
 const express = require('express');
 const { validationResult } = require('express-validator');
 const { body } = require('express-validator');
-const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList } = require('../microservices/order.microservice');
+const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList, GetMinExpectedDeliveryDaa, GetMinExpectedDeliveryDate } = require('../microservices/order.microservice');
 const { getApi } = require('../controller');
 const { getDynamicFieldListValidation } = require('../validations/brand.validate');
 const router = express.Router()
@@ -95,31 +95,33 @@ router.route('/GetMinExpectedDeliveryDate/brand-guid-key/:brand_guid_key/item-re
  * @swagger
  * path:
  * /api/Order/GetMinExpectedDeliveryDate/brand-guid-key/{brand_guid_key}/item-refs/{item_refs}/erp-id/{erp_id}:
- *   get:
+ *   post:
  *     summary: Return lead time of expected Delivery date.
  *     description: Return lead time of expected Delivery date.
  *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: brand_guid_key
- *         description: Brand primary Key
- *         schema:
- *           type: string
- *         required: true
+ *     requestBody: 
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brand_guid_key : 
+ *                 description: Brand primary Key
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: item_refs
- *         description: Item refs
- *         schema:
- *           type: string
- *         required: true
+ *               item_refs : 
+ *                 description: Item refs
+ *                 type: array
+ *                 items: 
+ *                   type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: erp_id
- *         description: Erp id
- *         schema:
- *           type: string
- *         required: true
+ *               erp_id:
+ *                 description: Erp id
+ *                 type: string
+ *                 required: true
  * 
  *     responses:
  *       200:
@@ -151,15 +153,21 @@ router.route('/GetMinExpectedDeliveryDate/brand-guid-key/:brand_guid_key/item-re
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */ 
-    .get(getMinExpectedDeliveryDateValidation, (req,res) => {
+    .post(getMinExpectedDeliveryDateValidation, async(req,res) => {
 
         const response = validationResult(req)
 
-        if( Object.entries(response.errors).length !==0 ) return res.json({ message: 'Check your request, validation failed', errors: response.array()})
+        console.log('body', req.body)
+        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+
+        
+        let minExpectedDeliveryDate = await GetMinExpectedDeliveryDate(req.body.brand_guid_key, req.body.item_refs, req.body.erp_id)
+
+        console.log("date", minExpectedDeliveryDate)
 
         res.json({
             message: 'Return lead time of expected Delivery date',
-            data: req.body
+            data: minExpectedDeliveryDate
         })
     })
 
