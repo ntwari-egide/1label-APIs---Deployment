@@ -119,6 +119,20 @@ exports.GetLocationList = async (brand_key, order_no, order_user) => {
 }
 
 exports.GetPOOrderStatus = () => {
+    return [
+        {
+        "order_status": "COMPLETE",
+        "status_id": 0
+        },
+        {
+        "order_status": "New",
+        "status_id": 2
+        },
+        {
+        "order_status": "Revised",
+        "status_id": 3
+        }
+       ]
 
 }
 
