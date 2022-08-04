@@ -29,16 +29,19 @@ const {sequelize} = require('../utils/dbConnection')
   * @swagger
   *  path:
   * /api/Item/GetItemRefDetail/guid-key/{guid_key}:
-  *   get:
+  *   post:
   *     summary: Search Item No Detail Data.
   *     description: Search Item No Detail Data
-  *     parameters:
-  *       - in: path
-  *         name: guid_key
-  *         description: Item No Primary key
-  *         schema:
-  *           type: string
-  *         required: true
+  *     requestBody:
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+  *               guid_key:
+  *                 description: Item No Primary key
+  *                 type: string
+  *                 required: true
   *     tags: [Items]
   *     responses:
   *       200:
@@ -128,13 +131,13 @@ const {sequelize} = require('../utils/dbConnection')
   * 
   */
  
-     .get( getItemRefDetailValidation, async(req,res) => {
+     .post( getItemRefDetailValidation, async(req,res) => {
         
-         const result = validationResult(req)
+        //  const result = validationResult(req)
  
-         if(Object.entries( result.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
+        //  if(Object.entries( result.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
  
-         let itemRefDetail = await GetItemRefDetail(req.params.guid_key)
+         let itemRefDetail = await GetItemRefDetail(req.body.guid_key)
          res.json({
              message: 'Search Item No Detail Data',
              data: itemRefDetail

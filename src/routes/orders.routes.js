@@ -264,60 +264,50 @@ router.route('/GetPOOrderList/order-user/:order_user/brand-key/:brand_key/order-
  * @swagger
  * path:
  * /api/Order/GetPOOrderList/order-user/{order_user}/brand-key/{brand_key}/order-date-from/{order_date_from}/order-date-to/{order_date_to}/order-status/{order_status}/factory-code/{factory_code}/consolidated-id/{consolidated_id}/order-no/{order_no}:
- *   get:
+ *   post:
  *     summary: Return PO Order List
  *     description: Return PO Order List
  *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: order_user
- *         description: Order user
- *         schema:
- *           type: string
- *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json: 
+ *           schema: 
+ *             type: object
+ *             properties: 
+ *               order_user:
+ *                 description: Order user
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: brand_key
- *         description: Brand key
- *         schema:
- *           type: string
- *         required: true
+ *               brand_key:
+ *                 description: Brand key
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_date_from
- *         description: Order date from
- *         schema:
- *           type: string
+ *               order_date_from:
+ *                 description: Order date from
+ *                 type: string
  * 
- *       - in: path
- *         name: order_date_to
- *         description: Order date to
- *         schema:
- *           type: string
+ *               order_date_to:
+ *                 description: Order date to
+ *                 type: string
  * 
- *       - in: path
- *         name: order_status
- *         description:  porder status
- *         schema:
- *           type: string
+ *               order_status:
+ *                 description:  porder status
+ *                 type: string
  * 
- *       - in: path
- *         name: factory_code
- *         description: factory code
- *         schema:
- *           type: string
+ *               factory_code:
+ *                 description: factory code
+ *                 type: string
  * 
- *       - in: path
- *         name: consolidated_id
- *         description: consilidated id
- *         schema:
- *           type: string
+ *               consolidated_id:
+ *                 description: consilidated id
+ *                 type: string
  * 
- *       - in: path
- *         name: order_no
- *         description: Order no
- *         schema:
- *           type: string
+ *               order_no:
+ *                 description: Order no
+ *                 type: string
  *     responses:
  *       200:
  *         description: PO Order list
@@ -388,13 +378,14 @@ router.route('/GetPOOrderList/order-user/:order_user/brand-key/:brand_key/order-
  *                   example: sqlserver connection timeout    
 */
 
-    .get( getPOOrderListValidation, async(req,res) => {
+    .post( getPOOrderListValidation, async(req,res) => {
 
-        const response = validationResult(req)
+        // const response = validationResult(req)
 
-        if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+
         
-        let orderList = await GetPOOrderList(req.params.order_user, req.params.brand_key, req.params.order_date_from, req.params.order_date_to, req.params.order_status, req.params.factory_code, req.params.consolidated_id, req.params.order_no)
+        let orderList = await GetPOOrderList(req.body.order_user, req.body.brand_key, req.body.order_date_from, req.body.order_date_to, req.body.order_status, req.body.factory_code, req.body.consolidated_id, req.body.order_no)
 
         console.log('orderList', orderList)
 
@@ -617,45 +608,41 @@ router.route('/GetDynamicFieldList/brand-key/:brand_key/show-status/:show_status
  * @swagger
  * path:
  * /api/Order/GetDynamicFieldList/brand-key/{brand_key}/show-status/{show_status}/order-user/{order_user}/order-no/{order_no}/is-po-order-tem/{is_po_order_temp}:
- *   get:
+ *   post:
  *     summary: Return Dynamic fields of Brand, limit 30 fields
  *     description: Return Dynamic fields of Brand, limit 30 fields
  *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: brand_key
- *         description: Brand primary Key
- *         schema:
- *           type: string
- *         required: true
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties: 
+ *               brand_key:
+ *                 description: Brand primary Key
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: show_status
- *         description: Y,N, empty
- *         schema:
- *           type: string
- *         required: true
+ *               show_status:
+ *                 description: Y,N, empty
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_user
- *         description: Login id
- *         schema:
- *           type: string
- *         required: true
+ *               order_user:
+ *                 description: Login id
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_no
- *         description: Order no
- *         schema:
- *           type: string
- *         required: true
+ *               order_no:
+ *                 description: Order no
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: is_po_order_temp
- *         description: Distinguish po order
- *         schema:
- *           type: string
- *         required: true
+ *       
+ *               is_po_order_temp:
+ *                 description: Distinguish po order
+ *                 type: string
+ *                 required: true
  * 
  *     responses:
  *       200:
@@ -681,14 +668,14 @@ router.route('/GetDynamicFieldList/brand-key/:brand_key/show-status/:show_status
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */ 
-    .get(getDynamicFieldListValidation, (req, res) => {
+    .post(getDynamicFieldListValidation, (req, res) => {
         
-        console.log('in controller', req.params)
-        const response = validationResult(req)
+        console.log('body', req.body)
+        // const response = validationResult(req)
         
-        if (Object.entries(response.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: response.array() })
+        // if (Object.entries(response.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: response.array() })
         
-        let dynamicFieldList = GetDynamicFieldList(req.params.brand_key, req.params.show_status, req.params.order_user, req.params.order_no, req.params.is_po_order_temp)
+        let dynamicFieldList = GetDynamicFieldList(req.body.brand_key, req.body.show_status, req.body.order_user, req.body.order_no, req.body.is_po_order_temp)
 
         res.json({
             message: 'Return Dynamic fields of Brand, limit 30 fields',
