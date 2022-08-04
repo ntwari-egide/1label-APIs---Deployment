@@ -528,31 +528,32 @@ router.route('/GetLocationList/brand-key/:brand_key/order-no/:order_no/order-use
  * @swagger
  * path:
  * /api/Order/GetLocationList/brand-key/{brand_key}/order-no/{order_no}/order-user/{order_user}:
- *   get:
+ *   post:
  *     summary: Return Dynamic fields of Brand, limit 30 fields
  *     description: Return Dynamic fields of Brand, limit 30 fields
  *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: brand_key
- *         description: Brand primary Key
- *         schema:
- *           type: string
- *         required: true
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties: 
+ *               brand_key:
+ *                 description: Brand primary Key
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_no
- *         description: Order no
- *         schema:
- *           type: string
- *         required: true
+ *       
+ *               order_no:
+ *                 description: Order no
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_user
- *         description: Login id
- *         schema:
- *           type: string
- *         required: true
+ *       
+ *               order_user:
+ *                 description: Login id
+ *                 type: string
+ *                 required: true
  * 
 
  * 
@@ -588,12 +589,14 @@ router.route('/GetLocationList/brand-key/:brand_key/order-no/:order_no/order-use
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */
-    .get( getLocationListValidation, (req,res) => {
-        const response = validationResult(req)
+    .post( getLocationListValidation, (req,res) => {
+        // const response = validationResult(req)
 
-        if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+
+        console.log("body", req.body)
         
-        let locationList = GetLocationList(req.params.brand_key, req.params.order_no, req.params.order_user)
+        let locationList = GetLocationList(req.body.brand_key, req.body.order_no, req.body.order_user)
 
         res.json({
             message: 'Return ERP List of brand',
