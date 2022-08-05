@@ -127,7 +127,61 @@ router.route('/GetPOBrandListByClient')
         
     })
 
-router.route('/GetWastageList')
+/**
+ * @swagger
+ * path:
+ * /api/Brand/GetWastageList/brand-key/{brand_key}:
+ *   get:
+ *     summary: Return order detail
+ *     description: Return order detai
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: brand_key
+ *         description: Brand Key
+ *         schema:
+ *           type: string
+ *         required: true
+ * 
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   show_status:
+ *                     type: string
+ *                     example: Y
+ *                   wastage_value:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         label:
+ *                           type: string
+ *                           example: 3%
+ *                         value: 
+ *                           type: string
+ *                           example: 0.05
+ * 
+ * 
+ *       500:
+ *         description: Fail Return
+ *         content:
+ *           application/json:
+ *             schema: 
+ *               type: object
+ *               properties:
+ *                 status: 
+ *                   example: Fail
+ *                 status_description: 
+ *                   example: error   
+*/
+router.route('/GetWastageList/brand-key/{brand_key')
     .get( getWastageListValidation, (req,res) => {
         
         const results = validationResponse(req);

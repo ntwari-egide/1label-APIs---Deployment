@@ -6,3 +6,18 @@ exports.GetItemRefDetail = async(guid_key) => {
 
     return itemRefDetail[0]
 }
+
+exports.GetItemList = async (order_user, brand_key, item_ref, item_ref_type) => {
+    let itemList = await sequelize.query(`select
+    i.guid_key,item_ref,item_ref_type,layout_file,D365ItemCode,item_ref_desc,brandid,
+    b.brand_name
+    from tb_item_reference i
+    left join tb_brand b on i.brandid=b.guid_key
+    inner join tb_cust_brand cb on b.guid_key=cb.brand_guid_key
+    inner join tb_cust cust on cust.guid_key=cb.cust_guid_key
+    where 1=1
+    and cust.admin='${order_user}'
+    and brandid='${brand_key}'
+    and ( item_ref like '${item_ref}' or D365ItemCode like '${item_ref}' )
+    --and item_ref_type ='${item_ref_type}'`)
+}
