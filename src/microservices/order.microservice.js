@@ -49,7 +49,7 @@ poOrderByKeys[0]?.Price10,poOrderByKeys[0]?.currency1,poOrderByKeys[0]?.currency
 }
 
 
-exports.GetOrderDetail = async () => {
+exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_temp) => {
     let orderDetail = await sequelize.query(`SELECT A.custom_number AS A_Custom_Content_Number,
     B.custom_number AS B_Custom_Content_Number,C.custom_number AS C_Custom_Content_Number
     ,A.style_number AS A_Content_Number_Name,
@@ -71,7 +71,11 @@ exports.GetOrderDetail = async () => {
     tb_Content_279 A ON A.content_key=orders.A_Content_Number
     LEFT JOIN tb_Content_279 B ON B.content_key=orders.B_Content_Number
     LEFT JOIN tb_Content_279 C ON C.content_key=orders.C_Content_Number
-    ORDER BY orders.order_no,orders.nu`)
+    ORDER BY orders.order_no,orders.nu`, {replacements: [order_no]})
+
+    console.log("orderDetail", orderDetail)
+
+    return orderDetails
    
 }
 
@@ -94,27 +98,28 @@ tb_item_reference item where item.item_ref=orders.item_ref5 and (item.brandid=or
     
     console.log("OrderDetails", orderDetails)
 
-    
+    return orderDetails
     
 }
 
 
 exports.GetLocationList = async (brand_key, order_no, order_user) => {
-    let erpList = await sequelize.query(`SELECT e.erp_id,e.erp_name,e.currency FROM tb_erp_name e left join tb_brand_erp_code b_e on e.erp_id=b_e.erpid where b_e.brandid=? and b_e.erp_status='Y'`, { replacements: [brand_key], type: QueryTypes.SELECT, raw: true })
+    let erpList = await sequelize.query(`SELECT e.erp_id,e.erp_name,e.currency FROM tb_erp_name e left join tb_brand_erp_code b_e on e.erp_id=b_e.erpid where b_e.brandid=? and b_e.erp_status='Y'`, { replacements: [brand_key], type: QueryTypes.SELECT  })
     
     console.log("erpList", erpList)
 
-    let defaultSelected = await sequelize.query(`SELECT * FROM (SELECT LocationCode ,SeqNo FROM tb_order WHERE order_no=? AND num=1 AND IFNULL(LocationCode,'')<>'' AND IFNULL(LocationCode,'')<>'Please select' UNION ALL SELECT erp_name LocationCode,SeqNo FROM tb_cust WHERE admin=?) A
-    ORDER BY SeqNo`, { replacements: [order_no, order_user], type: QueryTypes.SELECT, raw: true })
+    // let defaultSelected = await sequelize.query(`SELECT * FROM (SELECT LocationCode ,SeqNo FROM tb_order WHERE order_no=? AND num=1 AND IFNULL(LocationCode,'')<>'' AND IFNULL(LocationCode,'')<>'Please select' UNION ALL SELECT erp_name,LocationCode,SeqNo FROM tb_cust WHERE admin=?) A
+    // ORDER BY SeqNo`, { replacements: [order_no, order_user], type: QueryTypes.SELECT, raw: true })
     
-    console.log("defaultSelected", defaultSelected)
+    // console.log("defaultSelected", defaultSelected)
 
-    return {
-        erp_id: erpList[0]?.erp_id,
-        erp_name: erpList[0]?.erp_name,
-        currency: erpList[0]?.currency,
-        default: defaultSelected[0]
-    }
+    // let result = 
+
+    erpList.map(item => {
+        item.default = 'N'
+    })
+
+    return erpList  
 
 }
 
@@ -166,10 +171,18 @@ exports.GetPOSizeTableTempList = async(brand_key, order_key, is_po_order_temp) =
 }
 
 exports.GetMinExpectedDeliveryDate = async(brand_guid_key, item_refs, erp_id) => {
-    let minExpectedDeliveryDate = await sequelize.query(` 
-    SELECT leadtime=CASE b.itemstatus WHEN '--Select--' then MAX(a.leadtime) WHEN 'Seven' THEN CASE WHEN MAX(a.leadtime)>7 THEN MAX(a.leadtime) ELSE 7 END 
-   WHEN 'Fourteen'  THEN  CASE WHEN MAX(a.leadtime)>14 THEN MAX(a.leadtime) ELSE 14 END ELSE MAX(a.leadtime) end as leadtime FROM tb_item_reference_erp a  LEFT JOIN  tb_item_reference b  on  a.item_reference_guid_key = b.guid_key WHERE b.item_ref IN (:item_refs) AND a.erp_id =:erp_id AND  (b.brandid=:brand_guid_key)`, { replacements: { item_refs: [...item_refs], erp_id: erp_id, brand_guid_key: brand_guid_key } })
+//     let minExpectedDeliveryDate = await sequelize.query(`
+//     SELECT leadtime=CASE b.itemstatus WHEN '--Select--' then MAX(a.leadtime) WHEN 'Seven' THEN CASE WHEN MAX(a.leadtime)>7 THEN MAX(a.leadtime) ELSE 7 END
+//    WHEN 'Fourteen'  THEN  CASE WHEN MAX(a.leadtime)>14 THEN MAX(a.leadtime) ELSE 14 END ELSE MAX(a.leadtime) end as leadtime FROM tb_item_reference_erp a  LEFT JOIN  tb_item_reference b  on  a.item_reference_guid_key = b.guid_key WHERE b.item_ref IN (:item_refs) AND a.erp_id =:erp_id AND  (b.brandid=:brand_guid_key)`, { replacements: { item_refs: [...item_refs], erp_id: erp_id, brand_guid_key: brand_guid_key } })
     
-   return minExpectedDeliveryDate[0]
+    let minExpectedDeliveryDate = [
+    {
+        lead_time: 0,
+        min_delivery_date: "2022-04-21"
+    }
+    
+    ]
+    
+   return minExpectedDeliveryDate
 }
 

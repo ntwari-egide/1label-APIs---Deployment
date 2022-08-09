@@ -6,7 +6,7 @@
 const express = require('express');
 const { validationResult } = require('express-validator');
 const { body } = require('express-validator');
-const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList, GetMinExpectedDeliveryDaa, GetMinExpectedDeliveryDate } = require('../microservices/order.microservice');
+const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList, GetMinExpectedDeliveryDaa, GetMinExpectedDeliveryDate, GetOrderDetail } = require('../microservices/order.microservice');
 const { getApi } = require('../controller');
 const { getDynamicFieldListValidation } = require('../validations/brand.validate');
 const router = express.Router()
@@ -171,48 +171,44 @@ router.route('/GetMinExpectedDeliveryDate/brand-guid-key/:brand_guid_key/item-re
         })
     })
 
-router.route('/GetOrderDetail/brand-key/:brand_key/order-user/:order_user/order-no/:order_no/is-po-order-tem/:is_po_order_tem')
+router.route('/GetOrderDetail')
 /**
  * @swagger
  * path:
- * /api/orders/GetOrderDetail/brand-key/{brand_key}/order-user/{order_user}/order-no/{order_no}/is-po-order-tem/{is_po_order_tem}:
- *   get:
+ * /api/orders/GetOrderDetail:
+ *   post:
  *     summary: Return order detail
  *     description: Return order detai
  *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: brand_key
- *         description: Brand Key
- *         schema:
- *           type: string
- *         required: true
+ *     requestBody:
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+ *               brand_key:
+ *                 description: Brand Key
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_user
- *         description: Login ID
- *         schema:
- *           type: string
- *         required: true
+ *               order_user:
+ *                 description: Login ID
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: order_no
- *         description: Multiple PO order keys
- *         schema:
- *           type: string
- *         required: true
+ *               order_no:
+ *                 description: Multiple PO order keys
+ *                 type: string
+ *                 required: true
  * 
- *       - in: path
- *         name: is_po_order_temp
- *         description: 
- *         schema:
- *           type: string
- *         required: true  
+ *               is_po_order_temp:
+ *                 description: 
+ *                 type: string
+ *                 required: true  
  *     responses:
  *       200:
  *         description: Success
- *         content:
- *           application/json:
+ *         application/json:
  *             schema:
  *               type: array
  *               items:
@@ -245,16 +241,18 @@ router.route('/GetOrderDetail/brand-key/:brand_key/order-user/:order_user/order-
  *                 status_description: 
  *                   example: error   
 */  
-    .get( getOrderDetailValidation, (req,res) => {
+    .post( getOrderDetailValidation, async(req,res) => {
 
 
-        const response = validationResult(req)
+        // const response = validationResult(req)
 
-        if( Object.entries(response.errors).length !==0 ) return res.json({ message: 'Check your request, validation failed', errors: response.array()})
+        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+        
+        let orderDetail = await GetOrderDetail(req.body.brand_key, req.body.order_user, req.body.order_no, req.body.is_po_order_temp)
 
         res.json({
             message: 'Return order detail. Client double-click the order in the order listing go to the order form and show the order details',
-            data: req.body
+            data: orderDetail
         })
 
     })
@@ -523,11 +521,11 @@ router.route( '/GetPOSizeTableTempList/brand-key/:brand_key/order-key/:order_key
         
     })
 
-router.route('/GetLocationList/brand-key/:brand_key/order-no/:order_no/order-user/:order_user')
+router.route('/GetLocationList')
     /**
  * @swagger
  * path:
- * /api/Order/GetLocationList/brand-key/{brand_key}/order-no/{order_no}/order-user/{order_user}:
+ * /api/Order/GetLocationList:
  *   post:
  *     summary: Return Dynamic fields of Brand, limit 30 fields
  *     description: Return Dynamic fields of Brand, limit 30 fields
@@ -589,14 +587,13 @@ router.route('/GetLocationList/brand-key/:brand_key/order-no/:order_no/order-use
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */
-    .post( getLocationListValidation, (req,res) => {
+    .post( getLocationListValidation, async(req,res) => {
         // const response = validationResult(req)
 
         // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
 
-        console.log("body", req.body)
         
-        let locationList = GetLocationList(req.body.brand_key, req.body.order_no, req.body.order_user)
+        let locationList = await GetLocationList(req.body.brand_key, req.body.order_no, req.body.order_user)
 
         res.json({
             message: 'Return ERP List of brand',
@@ -606,11 +603,11 @@ router.route('/GetLocationList/brand-key/:brand_key/order-no/:order_no/order-use
     })
 
 
-router.route('/GetDynamicFieldList/brand-key/:brand_key/show-status/:show_status/order-user/:order_user/order-no/:order_no/is-po-order-tem/:is_po_order_temp')
+router.route('/GetDynamicFieldList')
     /**
  * @swagger
  * path:
- * /api/Order/GetDynamicFieldList/brand-key/{brand_key}/show-status/{show_status}/order-user/{order_user}/order-no/{order_no}/is-po-order-tem/{is_po_order_temp}:
+ * /api/Order/GetDynamicFieldList:
  *   post:
  *     summary: Return Dynamic fields of Brand, limit 30 fields
  *     description: Return Dynamic fields of Brand, limit 30 fields
@@ -671,14 +668,14 @@ router.route('/GetDynamicFieldList/brand-key/:brand_key/show-status/:show_status
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */ 
-    .post(getDynamicFieldListValidation, (req, res) => {
+    .post(getDynamicFieldListValidation, async(req, res) => {
         
         console.log('body', req.body)
         // const response = validationResult(req)
         
         // if (Object.entries(response.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: response.array() })
         
-        let dynamicFieldList = GetDynamicFieldList(req.body.brand_key, req.body.show_status, req.body.order_user, req.body.order_no, req.body.is_po_order_temp)
+        let dynamicFieldList = await GetDynamicFieldList(req.body.brand_key, req.body.show_status, req.body.order_user, req.body.order_no, req.body.is_po_order_temp)
 
         res.json({
             message: 'Return Dynamic fields of Brand, limit 30 fields',
