@@ -197,8 +197,95 @@ router.route('/GetDefaultContentByContentKey/brand-key/:brand_key/cont-key/:cont
         })
 
     })
-    
+
 router.route('/GetTranslationList')
+/**
+  * @swagger
+  *  path:
+  * /api/Translation/GetTranslationList:
+  *   post:
+  *     summary: GetTranslationList
+  *     description: GetTranslationList
+  *     requestBody:
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+  *               brand_key:
+  *                 description: brand key
+  *                 type: string
+  *                 required: true
+  * 
+  *               page_type:
+  *                 description: part, content, care, icon, country
+  *                 type: string
+  *                 required: true
+  * 
+  *               query_str:
+  *                 description:  search value
+  *                 type: string
+  *                 required: true
+  * 
+  *               part_key:
+  *                 description: part key
+  *                 type: string
+  *                 required: true
+  * 
+  *               icon_type_key:
+  *                 description: Icon key
+  *                 type: string
+  *                 required: true
+  * 
+  *               product_line_key:
+  *                 description:  search value
+  *                 type: string
+  *                 required: true
+  *     tags: [Items]
+  *     responses:
+  *       200:
+  *         description: Item Ref Detail
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: array
+  *               items:
+  *                 type: object
+  *                 properties:
+  *                       guid_key:
+  *                         type: string
+  *                         example: CEC28C46-CA6E-467B-BD15-ED320124BD37
+  *                       gb_translation:
+  *                         type: string
+  *                         example: Back of Fabric
+  *                       page_type:
+  *                         type: string
+  *                         example: part
+  *                       ist_percentage:
+  *                         type: string
+  *                         
+  *                       icon_symbol:
+  *                         type: string
+  *                       icon_file:
+  *                         type: string
+  * 
+  *       500:
+  *         description: Fail Return
+  *         content:
+  *           application/json:
+  *             schema: 
+  *               type: object
+  *               properties:
+  *                 error: 
+  *                   example: Fail
+  *                 error_description: 
+  *                   example: sqlserver connection timeout  
+  * 
+  * 
+  * 
+  * 
+  */
+ 
     .get( getTranslationListValidation, (req,res) => {
         const response = validationResponse(req)
 
