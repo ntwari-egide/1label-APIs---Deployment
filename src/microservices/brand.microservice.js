@@ -1,3 +1,8 @@
+/**
+ * @author: ntwari egide
+ * @description: brand microservices
+ */
+
 const { sequelize } = require("../utils/dbConnection");
 
 exports.GetPOBrandListByClient = async(order_user) => {
@@ -24,7 +29,7 @@ exports.GetWastageList = async (brand_id) => {
     FROM dbo.tb_brand A
     LEFT JOIN dbo.tb_company B ON a.company_key=B.guid_key
     LEFT JOIN dbo.tb_EdiConfig C ON A.guid_key=C.BrandId
-    WHERE A.guid_key=@BrandId`)
+    WHERE A.guid_key=${brand_id}`)
 
     return wastageList
 }
