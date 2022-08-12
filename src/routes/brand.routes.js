@@ -4,7 +4,7 @@
  */
 
 const express = require('express')
-const { GetPOBrandListByClient } = require('../microservices/brand.microservice')
+const { GetPOBrandListByClient, GetWastageList } = require('../microservices/brand.microservice')
 const { getDynamicFieldListValidation, getPOBrandListByClientValidation, getWastageListValidation } = require('../validations/brand.validate')
 const {getContentNumberSettingValidaton} = require('../validations/contact.validate')
 const router = express.Router()
@@ -186,11 +186,13 @@ router.route('/GetWastageList/brand-key/{brand_key')
         
         const results = validationResponse(req);
 
+        let wastageList = GetWastageList(req.params.brand_key)
+
         if( Object.entries(results.errors).length != 0 ) return res.send({ message: 'Check the parameters passed',errors: results.array()})
 
         res.json ({
             message: 'Return wastage list.',
-            data: req.params
+            data: wastageList
         })
 
     })
