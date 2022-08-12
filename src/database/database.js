@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
- const sequelize = new Sequelize('po_order', 'root', 'pass123', {
+ const sequelize = new Sequelize('PO_ORDER_DB', 'egide', '123', {
         host: 'localhost',
         dialect: 'mysql',
         port: 3307

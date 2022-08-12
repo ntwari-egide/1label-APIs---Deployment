@@ -21,7 +21,7 @@ exports.addPOOrder = async (brand_key, order_user, order_keys) => {
     let itemRef;
     if (EDISetup[0]?.IsImportItem === 'Y') {
          itemRef = await sequelize.query(`SELECT * FROM tb_OrderItems WHERE BrandId= :brand_key AND OrderKey=:order_keys`,{replacements: {brand_key, order_keys}} )
-    } else {
+    } else {    
          itemRef = await sequelize.query(`SELECT guid_key=B.guid_key,B.item_ref,B.BrandId FROM tb_Brand_item_ref A
         INNER JOIN tb_item_reference B ON A.item_guid_key=B.guid_key AND A.brandid= :brand_key`, {replacements: {brand_key}, type: QueryTypes.SELECT, raw: true})
     }
@@ -66,7 +66,7 @@ exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_tem
     brand_prefix='ACD') ) ) as d365itemcode5 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref6 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode6 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref7 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM 
     tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode7 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref8 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode8 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref9 and (item.brandid=orders.brandid OR item.brandid=
     (SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode9 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref10 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode10 FROM tb_order_edi_temp_279 as orders 
-    WHERE orders.order_no=@order_no
+    WHERE orders.order_no=${order_no}
     )orders LEFT JOIN 
     tb_Content_279 A ON A.content_key=orders.A_Content_Number
     LEFT JOIN tb_Content_279 B ON B.content_key=orders.B_Content_Number
