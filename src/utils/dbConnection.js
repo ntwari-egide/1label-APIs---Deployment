@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
  const sequelize = new Sequelize('po_order', 'egide', '123', {
         host: 'localhost',
         dialect: 'mysql',
-        port: 3307
+        port: 3306
       });
 
    try {

@@ -286,7 +286,7 @@ router.route('/GetTranslationList')
   * 
   */
  
-    .get( getTranslationListValidation, (req,res) => {
+    .post( getTranslationListValidation, (req,res) => {
         const response = validationResponse(req)
 
         if( Object.entries( response.errors).length != 0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
