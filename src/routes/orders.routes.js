@@ -170,11 +170,16 @@ router.route('/GetMinExpectedDeliveryDate/brand-guid-key/:brand_guid_key/item-re
         })
     })
 
-router.route('/GetOrderDetail')
+    router.route('/check')
+    .get( (req,res) => {
+        res.send('Welcome to check endpoints')
+        
+    } )
+
 /**
  * @swagger
  * path:
- * /api/orders/GetOrderDetail:
+ * /api/Order/GetOrderDetail:
  *   post:
  *     summary: Return order detail
  *     description: Return order detai
@@ -239,12 +244,13 @@ router.route('/GetOrderDetail')
  *                   example: Fail
  *                 status_description: 
  *                   example: error   
-*/  
+*/ 
+router.route('/GetOrderDetail') 
     .post( getOrderDetailValidation, async(req,res) => {
 
         const response = validationResult(req)
 
-        if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
         
         let orderDetail = await GetOrderDetail(req.body.brand_key, req.body.order_user, req.body.order_no, req.body.is_po_order_temp)
 
