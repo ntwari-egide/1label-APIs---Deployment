@@ -181,7 +181,7 @@ router.route('/GetPOBrandListByClient')
  *                 status_description: 
  *                   example: error   
 */
-router.route('/GetWastageList/brand-key/{brand_key')
+router.route('/GetWastageList/brand-key/:brand_key')
     .get( getWastageListValidation, (req,res) => {
         
         const results = validationResponse(req);

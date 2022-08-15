@@ -1,14 +1,14 @@
 const { Sequelize } = require('sequelize');
- const sequelize = new Sequelize('PO_ORDER_DB', 'egide', '123', {
+ const sequelize = new Sequelize('po_order', 'egide', '123', {
         host: 'localhost',
         dialect: 'mysql',
-        port: 3307
+        port: 3306
       });
 
    try {
     sequelize.authenticate()
    } catch (error) {
-    console.error(error)
+    console.error('Error occured: ', JSON.stringify(error))
 }
    
 module.exports = { sequelize }

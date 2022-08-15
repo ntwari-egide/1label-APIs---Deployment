@@ -31,5 +31,7 @@ exports.GetWastageList = async (brand_id) => {
     LEFT JOIN dbo.tb_EdiConfig C ON A.guid_key=C.BrandId
     WHERE A.guid_key=${brand_id}`)
 
+    console.log("returned here: ", wastageList)
+
     return wastageList
 }

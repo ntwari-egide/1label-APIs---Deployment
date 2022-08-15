@@ -13,7 +13,6 @@ const router = express.Router()
 const {addPOOrderValidation, getMinExpectedDeliveryDateValidation, getOrderDetailValidation, getIconSequenceValidation, getPOOrderListValidation, getPOSizeTableTempListValidation, getLocationListValidation, savePOOrderValidation} = require('../validations/orders.validate')
 
 
-
 router.route('/')
     .get( (req,res) => {
         console.log('reached out here .....');
@@ -171,11 +170,16 @@ router.route('/GetMinExpectedDeliveryDate/brand-guid-key/:brand_guid_key/item-re
         })
     })
 
-router.route('/GetOrderDetail')
+    router.route('/check')
+    .get( (req,res) => {
+        res.send('Welcome to check endpoints')
+        
+    } )
+
 /**
  * @swagger
  * path:
- * /api/orders/GetOrderDetail:
+ * /api/Order/GetOrderDetail:
  *   post:
  *     summary: Return order detail
  *     description: Return order detai
@@ -240,11 +244,11 @@ router.route('/GetOrderDetail')
  *                   example: Fail
  *                 status_description: 
  *                   example: error   
-*/  
+*/ 
+router.route('/GetOrderDetail') 
     .post( getOrderDetailValidation, async(req,res) => {
 
-
-        // const response = validationResult(req)
+        const response = validationResult(req)
 
         // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
         
@@ -375,24 +379,27 @@ router.route('/GetPOOrderList/order-user/:order_user/brand-key/:brand_key/order-
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */
-
-    .post( getPOOrderListValidation, async(req,res) => {
-
-        // const response = validationResult(req)
-
-        // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
-
-        
-        let orderList = await GetPOOrderList(req.body.order_user, req.body.brand_key, req.body.order_date_from, req.body.order_date_to, req.body.order_status, req.body.factory_code, req.body.consolidated_id, req.body.order_no)
-
-        console.log('orderList', orderList)
-
-        res.json({
-            message: 'Return po order list',
-            data: orderList
-        })
-        
+    .post( (req,res) => {
+        console.log('called me ....')
     })
+
+    // .post( getPOOrderListValidation, async(req,res) => {
+
+    //     // const response = validationResult(req)
+
+    //     // if (Object.entries(response.errors).length !== 0) return res.json({ message: 'Check your request, validation failed', errors: response.array() })
+
+        
+    //     let orderList = await GetPOOrderList(req.body.order_user, req.body.brand_key, req.body.order_date_from, req.body.order_date_to, req.body.order_status, req.body.factory_code, req.body.consolidated_id, req.body.order_no)
+
+    //     console.log('orderList', orderList)
+
+    //     res.json({
+    //         message: 'Return po order list',
+    //         data: orderList
+    //     })
+        
+    // })
 
     router.route('/GetPOOrderStatus')
     /**

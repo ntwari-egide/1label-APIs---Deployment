@@ -73,7 +73,7 @@ exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_tem
     LEFT JOIN tb_Content_279 C ON C.content_key=orders.C_Content_Number
     ORDER BY orders.order_no,orders.nu`, {replacements: [order_no]})
 
-    console.log("orderDetail", orderDetail)
+    console.log("orderDetail: ", orderDetail)
 
     return orderDetails
    

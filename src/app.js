@@ -110,7 +110,7 @@ app.use(route);
 // });
 
 process.on('uncaughtException', function (err) {
-  console.log(err);
+  // console.log(err);
 });
 
 if (cluster.isMaster) {
