@@ -65,17 +65,17 @@ exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_tem
     (select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref4 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode4 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref5 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE 
     brand_prefix='ACD') ) ) as d365itemcode5 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref6 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode6 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref7 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM 
     tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode7 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref8 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode8 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref9 and (item.brandid=orders.brandid OR item.brandid=
-    (SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode9 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref10 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode10 FROM tb_order_edi_temp_279 as orders 
-    WHERE orders.order_no=${order_no}
+    (SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode9 ,(select d365itemcode from tb_item_reference item where item.item_ref=orders.item_ref10 and (item.brandid=orders.brandid OR item.brandid=(SELECT guid_key FROM tb_brand WHERE brand_prefix='ACD') ) ) as d365itemcode10 FROM tb_order_edi_temp2 as orders 
+    WHERE orders.order_no='${order_no}'
     )orders LEFT JOIN 
-    tb_Content_279 A ON A.content_key=orders.A_Content_Number
-    LEFT JOIN tb_Content_279 B ON B.content_key=orders.B_Content_Number
-    LEFT JOIN tb_Content_279 C ON C.content_key=orders.C_Content_Number
+    tb_content A ON A.content_key=orders.A_Content_Number_Name
+    LEFT JOIN tb_content B ON B.content_key=orders.B_Content_Number
+    LEFT JOIN tb_content C ON C.content_key=orders.C_Content_Number
     ORDER BY orders.order_no,orders.nu`, {replacements: [order_no]})
 
-    console.log("orderDetail: ", orderDetail)
+    // console.log("orderDetail: ", orderDetail)
 
-    return orderDetails
+    return orderDetail
    
 }
 
@@ -147,13 +147,13 @@ exports.SavePOOrder = () => {
 }
 
 exports.GetPOOrderList = async(order_user, brand_key, order_date_from, order_date_to, order_status, factory_code, consolidated_id, order_no) => {
-    let orderList = await sequelize.query(`SELECT MAX(guid_key) guid_key, order_no, brandid as brand_key,SUM(CAST(total_qty as SIGNED)) AS total_qty,consolidated_id,supplier_code,factory_code,CAST(Send_Date as DATE) send_date,CASE status WHEN '0' THEN MAX(ConfirmDate) ELSE status_date END status_date,status,optionId=max(optionId), Product_Description=max(Product_Description), PoLastUpdateTime=max(PoLastUpdateTime) FROM tb_order_edi  WHERE 1=1 and Factory_Code like '${factory_code}' and Consolidated_ID like '${consolidated_id}' and Send_Date >=CAST('${order_date_from}' as DATE) and Send_Date <=CAST('${order_date_to}' as DATE) and status ='${order_status}' and (order_no like '${order_no}' or Consolidated_ID IN (SELECT Consolidated_ID FROM tb_order_edi WHERE order_no LIKE '${order_no}'))`)
+    let orderList = await sequelize.query(`SELECT MAX(guid_key) guid_key, order_no, brandid as brand_key,SUM(CAST(total_qty as SIGNED)) AS total_qty,consolidated_id,supplier_code,factory_code,CAST(Send_Date as DATE) send_date,CASE status WHEN '0' THEN MAX(ConfirmDate) ELSE status_date END status_date,status,optionId=max(optionId), Product_Description=max(Product_Description), PoLastUpdateTime=max(PoLastUpdateTime) FROM tb_order_edi_temp  WHERE 1=1 and Factory_Code like '${factory_code}' and Consolidated_ID like '${consolidated_id}' and Send_Date >=CAST('${order_date_from}' as DATE) and Send_Date <=CAST('${order_date_to}' as DATE) and status ='${order_status}' and (order_no like '${order_no}' or Consolidated_ID IN (SELECT Consolidated_ID FROM tb_order_edi_temp WHERE order_no LIKE '${order_no}'))`)
 
     // await sequelize.query('select * from tb_order')
     
-    console.log('orderList', orderList[0])
+    // console.log('orderList', orderList[0])
 
-    return orderList[0]
+    return orderList
 }
 
 

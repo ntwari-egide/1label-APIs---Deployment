@@ -20,7 +20,7 @@ exports.GetItemList = async (order_user, brand_key, item_ref, item_ref_type) => 
     and cust.admin='${order_user}'
     and brandid='${brand_key}'
     and ( item_ref like '${item_ref}' or D365ItemCode like '${item_ref}' )
-    --and item_ref_type ='${item_ref_type}'`)
+    and item_ref_type ='${item_ref_type}'`)
 
     return itemList
 }

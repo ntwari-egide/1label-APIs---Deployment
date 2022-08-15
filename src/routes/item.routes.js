@@ -6,7 +6,7 @@
  const express = require('express')
  const { validationResult } = require('express-validator')
 const { getItemRefDetailValidation, getItemListValidation } = require('../validations/items.validate')
- const {getAllItems, getItem, insertItem, updateItem, deleteItem, GetItemRefDetail} = require('../microservices/item.microservice')
+ const { getItem, insertItem, updateItem, deleteItem, GetItemRefDetail, GetItemList} = require('../microservices/item.microservice')
 const router = express.Router()
  
 const {sequelize} = require('../utils/dbConnection')
@@ -248,7 +248,7 @@ const {sequelize} = require('../utils/dbConnection')
  
          if (Object.entries(result.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: errors.array() })
 
-         getAllItems()
+         GetItemList(req.params.order_user, req.params.brand_key, req.params.item_ref, req.params.item_ref_type)
              .then(data => {
                  console.log("data", data)
                  res.json({
