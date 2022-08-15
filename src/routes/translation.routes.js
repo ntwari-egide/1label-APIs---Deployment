@@ -4,6 +4,7 @@
  */
 
 const express = require('express')
+const { validationResult } = require('express-validator')
 const { getCountryTranslationListValidation, getTranslationListValidation } = require('../validations/translation.validate')
 const router = express.Router()
 
@@ -287,7 +288,7 @@ router.route('/GetTranslationList')
   */
  
     .post( getTranslationListValidation, (req,res) => {
-        const response = validationResponse(req)
+        const response = validationResult(req)
 
         if( Object.entries( response.errors).length != 0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
