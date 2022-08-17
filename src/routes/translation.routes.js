@@ -5,6 +5,7 @@
 
 const express = require('express')
 const { validationResult } = require('express-validator')
+const { getDefaultContentByContentKey } = require('../microservices/content.microservice')
 const { getCountryTranslationListValidation, getTranslationListValidation } = require('../validations/translation.validate')
 const router = express.Router()
 
@@ -188,13 +189,15 @@ router.route('/GetDefaultContentByContentKey/brand-key/:brand_key/cont-key/:cont
 */  
     .get((req,res) => {
 
-        const response = validationResponse(req)
+        const response = validationResult(req)
 
         if( Object.entries( response.errors).length != 0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
+        const result = getDefaultContentByContentKey(req.params.brand_key, req.params.content_key, req.params.page_type)
+
         res.json({
             message: 'Return Default content by content',
-            data: req.params
+            data: result
         })
 
     })

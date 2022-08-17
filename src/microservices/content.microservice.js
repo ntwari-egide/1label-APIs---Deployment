@@ -32,3 +32,14 @@ exports.getContentNumberList = async (brand_key, content_group, query_str, order
     return contentNumberList;
 
 }
+
+
+exports.getDefaultContentByContentKey = async (brand_key,cont_key,page_type) => {
+
+    const deafultContent = await sequelize.query(`
+    select value=C.RelationContentKey,label=D.GB_TRANSLATION
+    from tb_DefaultContentMaintenance C LEFT JOIN {0} D on C.RelationContentKey=D.guid_key
+    where C.contentkey =${cont_key} order by D.GB_TRANSLATION`)
+
+    return deafultContent
+} 
