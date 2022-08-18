@@ -242,15 +242,15 @@ const {sequelize} = require('../utils/dbConnection')
   */
  
  router.route('/GetItemList/order-user/:order_user/brand-key/:brand_key/item-ref/:item_ref/item-ref-type/:item_ref_type')
-     .get( getItemListValidation, (req,res) => {
+     .get( getItemListValidation, async (req,res) => {
  
          const result = validationResult(req)
  
          if (Object.entries(result.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: errors.array() })
 
-         GetItemList(req.params.order_user, req.params.brand_key, req.params.item_ref, req.params.item_ref_type)
+         await GetItemList(req.params.order_user, req.params.brand_key, req.params.item_ref, req.params.item_ref_type)
              .then(data => {
-                 console.log("data", data)
+                
                  res.json({
                      message: 'Return Item listing with Brand / Item Code / Item Name / Item Type search',
                      data: data

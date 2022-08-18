@@ -88,13 +88,13 @@ router.route("/GetContentNumberDetail/brand-key/:brand_key/content-number-key/:c
  *                 error: Fail
  *                 error_description: sqlserver connection timeout   
 */
-    .get(getContentNumberDetailValidation, (req,res) => {
+    .get(getContentNumberDetailValidation, async (req,res) => {
 
         const validationResponse = validationResult(req)
 
         if(Object.entries(validationResponse.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
-        let response = GetContentNumberDetail(req.params.brand_key, req.params.content_number_key, req.params.order_user, req.params.style_number)
+        let response = await GetContentNumberDetail(req.params.brand_key, req.params.content_number_key, req.params.order_user, req.params.style_number)
 
         res.json({
             message: 'Return Content Number detail, including content,care,icon,default content',
@@ -170,13 +170,13 @@ router.route('/GetContentNumberList/brand-key/:brand_key/content-group/:content_
  *                 error_description: sqlserver connection timeout   
 */
    
-    .get( getContentNumberListValidation, (req,res) => {
+    .get( getContentNumberListValidation, async (req,res) => {
 
         const validationResponse = validationResult(req)
 
         if(Object.entries(validationResponse.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
-        const response = getContentNumberList(req.params.brand_key, req.params.content_group, req.params.query_str, req.params.order_user)
+        const response = await getContentNumberList(req.params.brand_key, req.params.content_group, req.params.query_str, req.params.order_user)
 
         res.json({
             message: 'Return Content Number List',
@@ -465,13 +465,13 @@ router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_u
   *                 error_description: 
   *                   example: sqlserver connection timeout    
  */    
-     .get( getContentNumberSettingValidaton, (req,res) => {
+     .get( getContentNumberSettingValidaton, async (req,res) => {
  
          const validationResponse = validationResult(req)
  
          if (Object.entries(validationResponse.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: errors.array() })
          
-         const response = getContentNumberSetting(req.params.brand_key)
+         const response = await getContentNumberSetting(req.params.brand_key)
          
          res.json({
              message: 'Return Content Number Setting of Brand',

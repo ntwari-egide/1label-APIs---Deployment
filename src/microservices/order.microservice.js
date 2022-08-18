@@ -165,8 +165,6 @@ exports.GetPOSizeTableTempList = async(brand_key, order_key, is_po_order_temp) =
     let sizeTableTempList = await sequelize.query(`select group_type=A.OptionId+','+ A.size_matrix_type1,A.order_no,option_id=A.OptionId,production_description=A Product_Description,supplier_code=A.Supplier_Code,factory_code=A.factory_code,size_matrix_type=A.size_matrix_type1, guid_key=B.GuidKey,order_key=B.OrderKey
     ,brand_key=B.BrandId,edi_order_no=B.EdiOrderNo,consolidated_id=B.ConsolidatedId,size_content=B.SizeContent,send_date=B.SendDate,create_date=B.CreateDate,B.total_qty1,B.total_qty2,B.total_qty3,B.total_qty4,B.total_qty5,B.total_qty6,B.total_qty7, B.total_qty8, B.total_qty9,B.total_qty10 from tb_AsosOrderPoSize B left join ${tb[0]?.TbOrderEDITemp}A on A.guid_key=B.OrderKey where A.order_no='?'`, order_key)
 
-    console.log('sizetable', sizeTableTempList)
-
 
     return sizeTableTempList;
 }
