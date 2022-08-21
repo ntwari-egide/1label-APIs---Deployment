@@ -45,6 +45,4 @@ exports.getDefaultContentByContentKey = async (brand_key,cont_key,page_type) => 
 
 exports.matchMultiContentNumber =  async (brand_key, order_user, content_group, part_key, cont_key, percentage, seqno1, cont_key1, seqno2, care_key) => {
 
-    
-
 }
