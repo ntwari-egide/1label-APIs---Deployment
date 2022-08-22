@@ -29,7 +29,7 @@ exports.GetWastageList = async (brand_id) => {
 FROM tb_brand A
 LEFT JOIN tb_company B ON A.company_key=B.guid_key
 LEFT JOIN tb_ediconfig C ON A.guid_key=C.BrandId
-WHERE A.guid_key='innoa'`)
+WHERE A.guid_key='${brand_id}'`)
 
     console.log('reached here ...', wastageList)
 
