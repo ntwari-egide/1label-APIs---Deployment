@@ -22,16 +22,16 @@ exports.GetPOBrandListByClient = async(order_user) => {
 
 exports.GetWastageList = async (brand_id) => {
     
-    let wastageList = await sequelize.query(`SELECT A.guid_key,brand_name,brand_prefix,display_Content,display_SizeTable,Content_Model,OrderModel,BatchConfirm,IsDataSync,B.guid_key CompanyKey,B.group_code CompanyGroupCode,qr_rengen_at,
-    qr_rengen_url
-    ,C.IsImportItem,C.IsAllowConfirmOrder,B.IsShowButtons,C.IsApplyMOQtoGroup
-    ,a.brand_url,A.OrderReceiptState,A.WastageSwitch,A.WastageValue
-    FROM dbo.tb_brand A
-    LEFT JOIN tb_company B ON a.company_key=B.guid_key
-    LEFT JOIN tb_ediconfig C ON A.guid_key=C.BrandId
-    WHERE A.guid_key=${brand_id}`)
+    let wastageList = await sequelize.query(`
+    SELECT A.guid_key,brand_name,brand_prefix,display_Content,display_SizeTable,Content_Model,OrderModel,BatchConfirm,IsDataSync,B.guid_key CompanyKey,B.group_code CompanyGroupCode,qr_rengen_at,qr_rengen_url
+,C.IsImportItem,C.IsAllowConfirmOrder,B.IsShowButtons,C.IsApplyMOQtoGroup
+,A.brand_url,A.OrderReceiptState,A.WastageSwitch,A.WastageValue
+FROM tb_brand A
+LEFT JOIN tb_company B ON A.company_key=B.guid_key
+LEFT JOIN tb_ediconfig C ON A.guid_key=C.BrandId
+WHERE A.guid_key='innoa'`)
 
-    console.log("returned here: ", wastageList)
+    console.log('reached here ...', wastageList)
 
     return wastageList
 }
