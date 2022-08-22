@@ -11,10 +11,10 @@ exports.GetPOBrandListByClient = async(order_user) => {
      inner join tb_cust_brand cb on b.guid_key=cb.brand_guid_key
      inner join tb_cust cust on cust.guid_key=cb.cust_guid_key
      where 1=1
-     and cust.admin=?
+     and cust.admin='${order_user}'
      and b.display='Y'
      and OrderModel in(7,8)
-     order by b.brand_name`, order_user)
+     order by b.brand_name`)
     
     return listByClient;
 } 
@@ -30,6 +30,7 @@ FROM tb_brand A
 LEFT JOIN tb_company B ON A.company_key=B.guid_key
 LEFT JOIN tb_ediconfig C ON A.guid_key=C.BrandId
 WHERE A.guid_key='${brand_id}'`)
+
 
     console.log('reached here ...', wastageList)
 

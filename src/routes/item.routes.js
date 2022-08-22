@@ -6,7 +6,7 @@
  const express = require('express')
  const { validationResult } = require('express-validator')
 const { getItemRefDetailValidation, getItemListValidation } = require('../validations/items.validate')
- const { getItem, insertItem, updateItem, deleteItem, GetItemRefDetail, GetItemList} = require('../microservices/item.microservice')
+ const { getItem, insertItem, updateItem, deleteItem, GetItemRefDetail, GetItemList, GetItemTypeList} = require('../microservices/item.microservice')
 const router = express.Router()
  
 const {sequelize} = require('../utils/dbConnection')
@@ -756,8 +756,8 @@ router.route("/UpdateItem/order-user/:order_user/brand-key/:brand_key/item-ref/:
   *  path:
   * /api/Item/GetItemTypeList:
   *   get:
-  *     summary: Return Item ref type List API
-  *     description: Return Item ref type List API
+  *     summary: Return Item type List API
+  *     description: Return Item type List API
   *     tags: [Items]
   *     responses:
   *       200: 
@@ -790,8 +790,18 @@ router.route("/UpdateItem/order-user/:order_user/brand-key/:brand_key/item-ref/:
   *                 error_description: 
   *                   example: sqlserver connection timeout                  
   */  
-     .get( (req,res) => {
-         res.send('Return Item ref type List API...')
+     .get( async (req,res) => {
+        
+        // const response = validationResult(req)
+
+        const result = await GetItemTypeList()
+
+        // if( Object.entries( response.errors).length != 0 ) return res.send({ message: 'Check the parameter passed', erorrs: response.array()})
+
+        res.json({
+            message: 'Return Item ref type List API...',
+            data: result
+        })
      })
  
  

@@ -25,3 +25,13 @@ exports.GetItemList = async (order_user, brand_key, item_ref, item_ref_type) => 
     return itemList
 }
 
+exports.GetItemTypeList = async () => {
+
+    let itemTypeList =  await sequelize.query(
+        ` SELECT id,name FROM tb_item_ref_type order by name`
+    )
+
+    return itemTypeList
+
+}
+

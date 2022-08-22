@@ -50,7 +50,8 @@ poOrderByKeys[0]?.Price10,poOrderByKeys[0]?.currency1,poOrderByKeys[0]?.currency
 
 
 exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_temp) => {
-    let orderDetail = await sequelize.query(`SELECT A.custom_number AS A_Custom_Content_Number,
+    let orderDetail = await sequelize.query(`
+    SELECT A.custom_number AS A_Custom_Content_Number,
     B.custom_number AS B_Custom_Content_Number,C.custom_number AS C_Custom_Content_Number
     ,A.style_number AS A_Content_Number_Name,
     B.style_number AS B_Content_Number_Name,C.style_number AS C_Content_Number_Name
@@ -71,7 +72,7 @@ exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_tem
     tb_content A ON A.content_key=orders.A_Content_Number_Name
     LEFT JOIN tb_content B ON B.content_key=orders.B_Content_Number
     LEFT JOIN tb_content C ON C.content_key=orders.C_Content_Number
-    ORDER BY orders.order_no,orders.nu`, {replacements: [order_no]})
+    ORDER BY orders.order_no,orders.nu`)
 
     // console.log("orderDetail: ", orderDetail)
 
@@ -79,8 +80,10 @@ exports.GetOrderDetail = async (brand_key, order_user, order_no, is_po_order_tem
    
 }
 
+
+
 exports.GetDynamicFieldList = async (brand_key, show_status, order_user, order_no, is_po_order_temp) => {
-    let orderFormFields = await sequelize.query("SELECT b_f.*,f.field_name FROM tb_Fields f LEFT join tb_Brand_Fields b_f ON f.field_name=b_f.fieldsid  WHERE 1=1 and show_status=? and b_f.brandid=? ORDER BY b_f.seqno", { replacements: [show_status, brand_key], type: QueryTypes.SELECT, raw: true })
+    let orderFormFields = await sequelize.query("SELECT b_f.*,f.field_name FROM tb_fields f LEFT join tb_brand_fields b_f ON f.field_name=b_f.fieldsid  WHERE 1=1 and show_status=? and b_f.brandid=? ORDER BY b_f.seqno", { replacements: [show_status, brand_key], type: QueryTypes.SELECT, raw: true })
     
     console.log("orderFormFields", orderFormFields)
 
@@ -91,9 +94,9 @@ tb_item_reference item where item.item_ref=orders.item_ref5 and (item.brandid=or
         FROM tb_order as orders 
         WHERE orders.order_no=?
         )orders LEFT JOIN 
-        tb_Content A ON A.content_key=orders.A_Content_Number
-        LEFT JOIN tb_Content B ON B.content_key=orders.B_Content_Number
-        LEFT JOIN tb_Content C ON C.content_key=orders.C_Content_Number
+        tb_content A ON A.content_key=orders.A_Content_Number
+        LEFT JOIN tb_content B ON B.content_key=orders.B_Content_Number
+        LEFT JOIN tb_content C ON C.content_key=orders.C_Content_Number
         ORDER BY orders.order_no,orders.num `, { replacements: [order_no], type: QueryTypes.SELECT, raw: true })
     
     console.log("OrderDetails", orderDetails)
