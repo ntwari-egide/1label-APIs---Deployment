@@ -696,17 +696,20 @@ router.route('/SavepoOrder')
  * @swagger
  *  path:
  * /api/Order/SavepoOrder:
- *   get:
+ *   post:
  *     summary: Save Order
  *     description: Save Order
- *     parameters:
- *       - in: path
- *         name: order_user
- *         description: Login ID
- *         schema:
- *           type: string
- *         required: true
  *     tags: [Orders]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties: 
+ *               brand_key:
+ *                 description: Brand primary Key
+ *                 type: string
+ *                 required: true
  *     responses:
  *       201:
  *         description: Check order passed
@@ -733,10 +736,10 @@ router.route('/SavepoOrder')
 
         const response = validationResult(req)
 
-        if( Object.entries(response.errors).length !==0 ) return res.json({ message: 'Check your request, validation failed', errors: response.array()})
+        // if( Object.entries(response.errors).length !==0 ) return res.json({ message: 'Check your request, validation failed', errors: response.array()})
 
         res.json({
-            message: 'Save Order',
+            message: 'Saved Order',
             data: req.body
         })
     })

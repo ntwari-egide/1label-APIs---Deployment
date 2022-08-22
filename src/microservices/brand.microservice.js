@@ -27,8 +27,8 @@ exports.GetWastageList = async (brand_id) => {
     ,C.IsImportItem,C.IsAllowConfirmOrder,B.IsShowButtons,C.IsApplyMOQtoGroup
     ,a.brand_url,A.OrderReceiptState,A.WastageSwitch,A.WastageValue
     FROM dbo.tb_brand A
-    LEFT JOIN dbo.tb_company B ON a.company_key=B.guid_key
-    LEFT JOIN dbo.tb_EdiConfig C ON A.guid_key=C.BrandId
+    LEFT JOIN tb_company B ON a.company_key=B.guid_key
+    LEFT JOIN tb_ediconfig C ON A.guid_key=C.BrandId
     WHERE A.guid_key=${brand_id}`)
 
     console.log("returned here: ", wastageList)

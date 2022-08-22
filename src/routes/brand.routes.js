@@ -90,11 +90,11 @@ router.route('/GetPOBrandListByClient')
  *                   example: error   
 */
 router.route('/GetWastageList/brand-key/:brand_key')
-    .get( getWastageListValidation, (req,res) => {
+    .get( getWastageListValidation, async (req,res) => {
         
         const results = validationResponse(req);
 
-        let wastageList = GetWastageList(req.params.brand_key)
+        let wastageList = await GetWastageList(req.params.brand_key)
 
         if( Object.entries(results.errors).length != 0 ) return res.send({ message: 'Check the parameters passed',errors: results.array()})
 
