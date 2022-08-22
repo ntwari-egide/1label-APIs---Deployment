@@ -187,13 +187,13 @@ router.route('/GetDefaultContentByContentKey/brand-key/:brand_key/cont-key/:cont
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */  
-    .get((req,res) => {
+    .get(async (req,res) => {
 
         const response = validationResult(req)
 
         if( Object.entries( response.errors).length != 0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
-        const result = getDefaultContentByContentKey(req.params.brand_key, req.params.content_key, req.params.page_type)
+        const result = await getDefaultContentByContentKey(req.params.brand_key, req.params.content_key, req.params.page_type)
 
         res.json({
             message: 'Return Default content by content',

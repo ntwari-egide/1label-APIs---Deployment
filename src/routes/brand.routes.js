@@ -4,6 +4,7 @@
  */
 
 const express = require('express')
+const { validationResult } = require('express-validator')
 const { GetPOBrandListByClient, GetWastageList } = require('../microservices/brand.microservice')
 const { getDynamicFieldListValidation, getPOBrandListByClientValidation, getWastageListValidation } = require('../validations/brand.validate')
 const {getContentNumberSettingValidaton} = require('../validations/contact.validate')
@@ -38,7 +39,7 @@ router.route('/GetPOBrandListByClient')
 /**
  * @swagger
  * path:
- * /api/Brand/GetWastageList/brand-key/{brand_key}:
+ * /api/Brand/GetWastageList/brand_key/{brand_key}:
  *   get:
  *     summary: Return order detail
  *     description: Return order detai
@@ -89,18 +90,18 @@ router.route('/GetPOBrandListByClient')
  *                 status_description: 
  *                   example: error   
 */
-router.route('/GetWastageList/brand-key/:brand_key')
-    .get( getWastageListValidation, (req,res) => {
+router.route('/GetWastageList/brand_key/:brand_key')
+    .get( getWastageListValidation, async (req,res) => {
         
-        const results = validationResponse(req);
+        const results = validationResult(req);
 
-        let wastageList = GetWastageList(req.params.brand_key)
+        let wastageList = await GetWastageList(req.params.brand_key)
 
         if( Object.entries(results.errors).length != 0 ) return res.send({ message: 'Check the parameters passed',errors: results.array()})
 
         res.json ({
-            message: 'Return wastage list.',
-            data: wastageList
+            message: 'Return wastage list.',    
+            data: wastageList   
         })
 
     })
