@@ -14,7 +14,7 @@ const getDynamicFieldListValidation = [
 ]
 
 const getPOBrandListByClientValidation = [
-    param("order_user","Brand key is required").isString().isLength({ max: 50})
+    param("order_user","Brand key is required").isString()
 ]
 
 const getWastageListValidation = [
