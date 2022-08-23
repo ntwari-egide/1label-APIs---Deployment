@@ -144,7 +144,54 @@ exports.GetPOOrderStatus = () => {
 
 }
 
-exports.SavePOOrder = () => {
+const getCustomerDetails =  async (admin) => {
+    let customerDetails = await sequelize.query(
+        `Select * from tb_cust where admin='${admin}'`
+    )
+
+    return customerDetails
+}
+
+const getDisableInputPercentageStatus = async (guid_key,order_user) => {
+        
+    // let customerDetails = await getCustomerDetails(body.order_user)
+
+    let disableInputPercentage = await sequelize.query(
+        `select DisableInputPercentage from (Select * from tb_cust where admin='${order_user}') as data where 1=1 and guid_key='${guid_key}'`
+    )
+
+    return disableInputPercentage;
+}
+
+const getOrderLine = async (order_no) => {
+    let count = await sequelize.query(
+        `SELECT COUNT(*)+1 FROM tb_order WHERE order_no='${order_no}'`
+    );
+
+    return count;
+}
+
+
+ 
+exports.SavePOOrder = async (body) => {
+    
+    let customerDetails = await getCustomerDetails(body.order_user)
+
+    // console.log('customer details: ', await customerDetails[0][0])
+
+    // check if order_status is Confirm
+    if(body.order_status === 'Confirm') body.order_status = new Date().toISOString()
+
+    //--If the field ”DisableInputPercentage“ is Y indicates the unfilled percentage.
+    // let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
+
+    // console.log('Disabled details: ', await disableInputPercentage)
+
+    // Return order line by order no.
+
+    const orderLine = await getOrderLine(body.order_no);
+    console.log('order line : ', await orderLine)
+
     
 
 }

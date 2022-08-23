@@ -6,7 +6,7 @@
 const express = require('express');
 const { validationResult } = require('express-validator');
 const { body } = require('express-validator');
-const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList, GetMinExpectedDeliveryDaa, GetMinExpectedDeliveryDate, GetOrderDetail } = require('../microservices/order.microservice');
+const { addPOOrder, GetDynamicFieldList, GetLocationList, GetPOOrderList, GetPOSizeTableTempList, GetMinExpectedDeliveryDaa, GetMinExpectedDeliveryDate, GetOrderDetail, SavePOOrder } = require('../microservices/order.microservice');
 const { getApi } = require('../controller');
 const { getDynamicFieldListValidation } = require('../validations/brand.validate');
 const router = express.Router()
@@ -732,9 +732,11 @@ router.route('/SavepoOrder')
  *                         description: status description
  *                         example: dbb98fac-d44a-4e5f-add3-bfec01ef5499
  */
-    .post( savePOOrderValidation, (req,res) => {
+    .post( savePOOrderValidation, async (req,res) => {
 
         const response = validationResult(req)
+
+        await SavePOOrder(req.body)
 
         // if( Object.entries(response.errors).length !==0 ) return res.json({ message: 'Check your request, validation failed', errors: response.array()})
 
