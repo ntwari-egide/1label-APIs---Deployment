@@ -6,7 +6,8 @@
  const { validationResult } = require('express-validator');
 const express = require('express')
 const { GetContentNumberDetail, getContentNumberSetting, getContentNumberList, matchMultiContentNumber } = require('../microservices/content.microservice')
-const {  getContentNumberListValidation,getContentNumberDetailValidation, getIconSequenceValidation, matchMultiContentNumberValidation, getContentNumberSettingValidaton } = require('../validations/contact.validate')
+const {  getContentNumberListValidation,getContentNumberDetailValidation, getIconSequenceValidation, matchMultiContentNumberValidation, getContentNumberSettingValidaton } = require('../validations/contact.validate');
+const { sequelize } = require('../utils/dbConnection');
 
 const router = express.Router()
 
@@ -257,14 +258,17 @@ router.route('/GetIconSequence/brand-key/:brand_key/icon-group/:icon_group/icon-
  *                 error_description: 
  *                   example: sqlserver connection timeout    
 */   
-    .get( getIconSequenceValidation, (req,res) => {
-        const validationResponse = validationResponse(req)
+    .get( getIconSequenceValidation, async (req,res) => {
+        const validationResponse = validationResult(req)
 
-        if(Object.entries(validationResponse.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
+        // if(Object.entries(validationResponse.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
+
+
+        let result = await this.getIconSequence(req.params.brand_key, req.params.icon_group, req.params.icon_key)
 
         res.json({
             message: 'Return wash / Footwear Icon sequence',
-            data: req.params
+            data: result
         })
         
     })
@@ -479,6 +483,27 @@ router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_u
          })
  
      })
+
+
+     exports.getIconSequence = async (brand_key, icon_group, icon_key) => {
+
+        let result = await sequelize.query(
+            `SELECT A.sysicon_key,B.ENDescr,B.enfile,B.enfile_foot,
+            iconSymbol,C.*
+            FROM (SELECT A.ID AS IconTypeId, ISNULL(SeqNo,seq) AS SeqNo
+            ,ISNULL(IsEnable,'Y')AS IsEnable,ISNULL(Alias,IconDescr) AS sys_typ
+            FROM (SELECT * FROM tb_sys_iconItem WHERE icon_group='${icon_group}') A
+            LEFT JOIN (SELECT * FROM tb_brandiconconfigure WHERE BrandId='${brand_key}') B
+            ON A.id=B.IconTypeId) C
+            LEFT JOIN (SELECT seqno,sysicon_key,IconTypeId FROM {0} WHERE care_key=$'{icon_key}' AND IconType='${icon_group}' )A
+            LEFT JOIN {1} B
+            ON A.sysicon_key=B.guid_key
+            ON A.IconTypeId=C.IconTypeId WHERE C.IsEnable='Y' ORDER BY C.SeqNo`
+        )
+
+        return result;
+
+     }
  
  
 
