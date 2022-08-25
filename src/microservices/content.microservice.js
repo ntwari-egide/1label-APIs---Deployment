@@ -44,5 +44,6 @@ exports.getDefaultContentByContentKey = async (brand_key,cont_key,page_type) => 
 // router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_user?/content-group/:content_group?/content/part-key?/:part_key?/cont-key/:cont_key?/percentage/:percentage?/seqno/:seqno1?/default-content/cont-key/:cont_key1?/seqno/:seqno2?/care/care-key/:care_key?/seqno/:seqno2/icon/icon-key/:icon_key?/icon-type/:icon_type_id?/seqno/:seqno3?')
 
 exports.matchMultiContentNumber =  async (brand_key, order_user, content_group, part_key, cont_key, percentage, seqno1, cont_key1, seqno2, care_key) => {
-    
+    const contentnum = await sequelize.query(`
+    `)
 }
