@@ -5,7 +5,7 @@
 
  const { validationResult } = require('express-validator');
 const express = require('express')
-const { GetContentNumberDetail, getContentNumberSetting, getContentNumberList, matchMultiContentNumber } = require('../microservices/content.microservice')
+const { GetContentNumberDetail, getContentNumberSetting, getContentNumberList, matchMultiContentNumber, getIconSequence } = require('../microservices/content.microservice')
 const {  getContentNumberListValidation,getContentNumberDetailValidation, getIconSequenceValidation, matchMultiContentNumberValidation, getContentNumberSettingValidaton } = require('../validations/contact.validate');
 const { sequelize } = require('../utils/dbConnection');
 
@@ -264,7 +264,7 @@ router.route('/GetIconSequence/brand-key/:brand_key/icon-group/:icon_group/icon-
         // if(Object.entries(validationResponse.errors).length !=0 ) return res.send({ message: 'Check the parameter passed', erorrs: errors.array()})
 
 
-        let result = await this.getIconSequence(req.params.brand_key, req.params.icon_group, req.params.icon_key)
+        let result = await getIconSequence(req.params.brand_key, req.params.icon_group, req.params.icon_key)
 
         res.json({
             message: 'Return wash / Footwear Icon sequence',
@@ -397,19 +397,19 @@ router.route('/GetIconSequence/brand-key/:brand_key/icon-group/:icon_group/icon-
  *                   example: sqlserver connection timeout    
 */   
 router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_user?/content-group/:content_group?/content/part-key/:part_key?/cont-key/:cont_key?/percentage/:percentage?/seqno/:seqno1?/default-content/cont-key/:cont_key1?/seqno/:seqno2?/care/care-key/:care_key?/seqno/icon/icon-key/:icon_key?/icon-type/:icon_type_id?/seqno/:seqno3?')
-    .get( matchMultiContentNumberValidation, (req,res) => {
+    .get( matchMultiContentNumberValidation, async (req,res) => {
 
         const validationResponse = validationResult(req);
         
-        if (!validationResponse.isEmpty()) {
-            return res.send({ message: 'Check the parameter passed', erorrs: validationResponse.array()})
-        }
+        // if (!validationResponse.isEmpty()) {
+        //     return res.send({ message: 'Check the parameter passed', erorrs: validationResponse.array()})
+        // }
     
-        const result = matchMultiContentNumber(req.params.brand_key, req.params.order_user, req.params.content_group, req.params.part_key, req.params.cont_key,req.params.percentage, req.params.seqno1, req.params.cont_key1, req.params.seqno2, req.params.care_key, req.params.icon_key, req.params.icon_type_id, req.params.seqno3)
+        const result = await matchMultiContentNumber(req.params.brand_key, req.params.order_user, req.params.content_group, req.params.part_key, req.params.cont_key,req.params.percentage, req.params.seqno1, req.params.cont_key1, req.params.seqno2, req.params.care_key, req.params.icon_key, req.params.icon_type_id, req.params.seqno3)
 
         res.json({
             message: 'Return Content number & care number',
-            data: req.params
+            data: result
         })
         
     })
@@ -483,27 +483,6 @@ router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_u
          })
  
      })
-
-
-     exports.getIconSequence = async (brand_key, icon_group, icon_key) => {
-
-        let result = await sequelize.query(
-            `SELECT A.sysicon_key,B.ENDescr,B.enfile,B.enfile_foot,
-            iconSymbol,C.*
-            FROM (SELECT A.ID AS IconTypeId, ISNULL(SeqNo,seq) AS SeqNo
-            ,ISNULL(IsEnable,'Y')AS IsEnable,ISNULL(Alias,IconDescr) AS sys_typ
-            FROM (SELECT * FROM tb_sys_iconItem WHERE icon_group='${icon_group}') A
-            LEFT JOIN (SELECT * FROM tb_brandiconconfigure WHERE BrandId='${brand_key}') B
-            ON A.id=B.IconTypeId) C
-            LEFT JOIN (SELECT seqno,sysicon_key,IconTypeId FROM {0} WHERE care_key=$'{icon_key}' AND IconType='${icon_group}' )A
-            LEFT JOIN {1} B
-            ON A.sysicon_key=B.guid_key
-            ON A.IconTypeId=C.IconTypeId WHERE C.IsEnable='Y' ORDER BY C.SeqNo`
-        )
-
-        return result;
-
-     }
  
  
 
