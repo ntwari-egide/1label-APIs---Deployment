@@ -171,7 +171,62 @@ const getOrderLine = async (order_no) => {
     return count;
 }
 
+const getCountryCodeForContent =  async (brandid) => {
+    let countryCode = await sequelize.query(
+        `
+        select tc.country_code id,c_url,ti.country_code icon_country from tb_countrycode_qr tcq
+        left join tb_countrycode tc on tc.guid_key=tcq.country_code_key
+        left join tb_countrycode ti on ti.guid_key=tcq.icon_symbol
+        where show_status='Y' and brandid='${brandid}'
+        order by tcq.seqno
+        `
+    )
 
+    return countryCode
+}
+
+const getAPIlink = async (order_no, order) => {
+    let apiLink = await sequelize.query(
+        ` 
+        SELECT c.ApiLink ,a.currency FROM tb_erp_name a LEFT JOIN tb_order b ON a.erp_name = b.LocationCode LEFT JOIN tb_erp_api_module c ON a.erp_id = c.ErpId WHERE b.order_no ='" + xBean.${order_no} + "' and c.ApiModuleType='${order}'
+        `
+    )
+}
+
+const getOrderData = async () => {
+
+    
+
+    let orderData = await sequelize.query(`
+    select (isnull(o.content_number,'')+' '+isnull(q.VersionNum,'')) [AW_Number], edi.IsGenericConcession, o.guid_key,Company_Code= p.group_code,Order_Number=order_no+'_'+cast(num as varchar(10)),
+    Factory_PO_No=o.po_number,
+    Nike_PO_No= '',
+    {2}
+    total_qty,
+    size_matrix_type=size_matrix_type1,
+    size_content=size_content1,
+    delivery_addr,
+    delivery_email,
+    delivery_contact,
+    delivery_phone,
+    delivery_fax,
+    delivery_post_code,
+    delivery_addr2,
+    delivery_addr3,
+    delivery_cpyname,
+    delivery_country,
+    delivery_city,invoice_cpyname,invoice_addr,invoice_email,invoice_contact,invoice_phone,invoice_fax,invoice_addr2
+    ,invoice_addr3 ,
+    Content_Number=q.A_Content_Number,
+    Care_Number=q.B_Content_Number,
+    Icon_Number=q.C_Content_Number,
+    Line_Number='',
+    Order_Seq_Zoned= '',
+    Expected_Delivery_Date=o.order_expdate
+    from {0} o left join tb_brand b on o.brandid=b.guid_key left join tb_EdiConfig edi on b.guid_key = edi.BrandId left join tb_company p on b.company_key = p.guid_key LEFT JOIN {1} q ON o.content_number=q.Z_Content_Number where
+    order_no=@order_no order by o.num", dyTbBean.TbOrder, dyTbBean.TbZContent, itemSql)
+    `)
+}
  
 exports.SavePOOrder = async (body) => {
     
@@ -191,6 +246,18 @@ exports.SavePOOrder = async (body) => {
 
     const orderLine = await getOrderLine(body.order_no);
     console.log('order line : ', await orderLine)
+
+    //return country codes for content
+
+    const countryCode = await getCountryCodeForContent(body.brandid);
+
+    // Get the API link of order for the location code selected for the current order.
+
+    const apiLink = await getAPIlink(body.order_no, body.order_no);
+
+    //Get the order data.
+
+
 
     
 
