@@ -62,3 +62,24 @@ exports.matchMultiContentNumber =  async (brand_key,order_user,content_group,par
 
     return contentnum;
 }
+
+
+exports.getIconSequence = async (brand_key, icon_group, icon_key) => {
+
+    let result = await sequelize.query(
+        `SELECT A.sysicon_key,B.ENDescr,B.enfile,B.enfile_foot,
+        iconSymbol,C.*
+        FROM (SELECT A.ID AS IconTypeId, ISNULL(SeqNo) AS SeqNo
+        ,ISNULL(IsEnable)AS IsEnable,ISNULL(Alias) AS sys_typ
+        FROM (SELECT * FROM tb_sys_iconitem WHERE icon_group='${icon_group}') A
+        LEFT JOIN (SELECT * FROM tb_brandiconconfigure WHERE BrandId='${brand_key}') B
+        ON A.id=B.IconTypeId) C
+        LEFT JOIN (SELECT seqno,sysicon_key,IconTypeId FROM tb_care_icon WHERE care_key='${icon_key}' AND IconType='F' )A
+        LEFT JOIN tb_sys_icon B
+        ON A.sysicon_key=B.guid_key
+        ON A.IconTypeId=C.IconTypeId WHERE C.IsEnable='Y' ORDER BY C.SeqNo;`
+    )
+
+    return result;
+
+ }
