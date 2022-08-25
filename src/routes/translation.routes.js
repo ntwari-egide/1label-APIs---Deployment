@@ -6,6 +6,7 @@
 const express = require('express')
 const { validationResult } = require('express-validator')
 const { getDefaultContentByContentKey } = require('../microservices/content.microservice')
+const { getCountryTranslationList } = require('../microservices/translation.microservice')
 const { getCountryTranslationListValidation, getTranslationListValidation } = require('../validations/translation.validate')
 const router = express.Router()
 
@@ -98,22 +99,17 @@ router.route('/GetCountryTranslationList/brand-key/:brand_key/page-type/:page_ty
  *                 error: request timeout
  *                 error_description: sqlserver connection timeout   
 */
-    .get( getCountryTranslationListValidation, (req,res) => {
-        try {
-            const response = validationResponse(req)
+    .get( getCountryTranslationListValidation, async (req,res) => {
+            const response = validationResult(req)
 
             if (Object.entries(response.errors).length != 0) return res.send({ message: 'Check the parameter passed', erorrs: errors.array() })
 
+            let allcountry = await getCountryTranslationList(req.params.brand_key, req.params.page_type, req.params.query_str)
+
             res.json({
                 message: 'Return country list',
-                data: req.params
+                data: allcountry
             })
-        } catch (e) {
-            return res.status(500).send({
-                error: "request timeout",
-                error_description: "sqlserver connection timeout"
-            })
-        }
     })
    
 router.route('/GetDefaultContentByContentKey/brand-key/:brand_key/cont-key/:content_key/page-type/:page_type')
