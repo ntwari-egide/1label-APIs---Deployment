@@ -397,19 +397,19 @@ router.route('/GetIconSequence/brand-key/:brand_key/icon-group/:icon_group/icon-
  *                   example: sqlserver connection timeout    
 */   
 router.route('/MatchMultiContentNumber/brand-key/:brand_key?/order-user/:order_user?/content-group/:content_group?/content/part-key/:part_key?/cont-key/:cont_key?/percentage/:percentage?/seqno/:seqno1?/default-content/cont-key/:cont_key1?/seqno/:seqno2?/care/care-key/:care_key?/seqno/icon/icon-key/:icon_key?/icon-type/:icon_type_id?/seqno/:seqno3?')
-    .get( matchMultiContentNumberValidation, (req,res) => {
+    .get( matchMultiContentNumberValidation, async (req,res) => {
 
         const validationResponse = validationResult(req);
         
-        if (!validationResponse.isEmpty()) {
-            return res.send({ message: 'Check the parameter passed', erorrs: validationResponse.array()})
-        }
+        // if (!validationResponse.isEmpty()) {
+        //     return res.send({ message: 'Check the parameter passed', erorrs: validationResponse.array()})
+        // }
     
-        const result = matchMultiContentNumber(req.params.brand_key, req.params.order_user, req.params.content_group, req.params.part_key, req.params.cont_key,req.params.percentage, req.params.seqno1, req.params.cont_key1, req.params.seqno2, req.params.care_key, req.params.icon_key, req.params.icon_type_id, req.params.seqno3)
+        const result = await matchMultiContentNumber(req.params.brand_key, req.params.order_user, req.params.content_group, req.params.part_key, req.params.cont_key,req.params.percentage, req.params.seqno1, req.params.cont_key1, req.params.seqno2, req.params.care_key, req.params.icon_key, req.params.icon_type_id, req.params.seqno3)
 
         res.json({
             message: 'Return Content number & care number',
-            data: req.params
+            data: result
         })
         
     })
