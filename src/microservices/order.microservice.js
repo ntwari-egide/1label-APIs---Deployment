@@ -255,11 +255,45 @@ exports.SavePOOrder = async (body) => {
 
     const apiLink = await getAPIlink(body.order_no, body.order_no);
 
-    //Get the order data.
+    //Get the order data
 
+    const orderData = await sequelize.query(`
+    Select * from tb_order where order_no='${body.order_no}'
+    `)
 
+    //  item ref setting
+
+    const itemRefSetting = await sequelize.query(`
+    select layout_file,guid_key
+,is_nonsize --non size item
+,wastage=case when isnull(hasqr,'N')='Y' then ROUND(CAST(isnull(wastage,0) as float)/100, 2) else 0 end
+,enablePrint --enable direct print
+,EnableDPPDFBySize -- enable artwork pdf by size
+,ArtworkItemType=case when isnull(hasqr,'N')='Y' then 'QR' when isnull(EnableArtworkBarcode,'N')='Y' then 'Barcode' else 'Normal' end,ArtworkLabel
+from tb_item_reference where 1=1
+and item_ref='${body.item_ref}';
+    `)
+
+    // size data for order
+
+    const sizeData = await sequelize.query(`
+    select * from TbOrderSizeTableDtl where order_key='${body.guid_no}' order by id
+    `)
+
+    // Edi status updated
+
+    string.Format(`UPDATE TbOrderEDI SET status=0,ConfirmDate=GETDATE() FROM TbOrderEDI A,(SELECT B.EdiOrderNo,B.ConsolidatedId FROM tb_order A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}') B WHERE A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId`, dyTbBean.TbOrderEDI, dyTbBean.TbOrder);
+
+    //  Check that total page no. of artwork order, when the total page no. is null then updated the xml status is N, otherwise, updated it to Y
+
+    string.Format(`UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and ( SELECT count(b.Total_Page_No) cun FROM  tb_order A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and b.Total_Page_No is not null)>0`, dyTbBean.TbOrder);
+
+    // send order email for confirm order if order status is confirm. reference to the SendArtworkEmail API
 
     
+
+
+
 
 }
 
