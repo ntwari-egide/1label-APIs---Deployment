@@ -297,36 +297,40 @@ exports.SavePOOrder = async (body) => {
 
     //  item ref setting
 
-    const itemRefSetting = await sequelize.query(`
-    select layout_file,guid_key
-,is_nonsize --non size item
-,wastage=case when isnull(hasqr,'N')='Y' then ROUND(CAST(isnull(wastage,0) as float)/100, 2) else 0 end
-,enablePrint --enable direct print
-,EnableDPPDFBySize -- enable artwork pdf by size
-,ArtworkItemType=case when isnull(hasqr,'N')='Y' then 'QR' when isnull(EnableArtworkBarcode,'N')='Y' then 'Barcode' else 'Normal' end,ArtworkLabel
-from tb_item_reference where 1=1
-and item_ref='${body.item_ref}';
+    const itemRefSetting = await sequelize.query(`select layout_file,guid_key
+    ,is_nonsize
+    ,wastage=case when isnull(hasqr)='Y' then ROUND(CAST(isnull(wastage) as float)/100, 2) else 0 end
+    ,enablePrint
+    ,EnableDPPDFBySize
+    ,case when isnull(hasqr)='Y' then 'QR' when isnull(EnableArtworkBarcode)='Y' then 'Barcode' else 'Normal' end as ArtworkItemType,ArtworkLabel
+    from tb_item_reference where 1=1
+    and item_ref='${body.item_ref[0].item_ref}';
     `)
 
     // size data for order
 
     const sizeData = await sequelize.query(`
-    select * from TbOrderSizeTableDtl where order_key='${body.guid_no}' order by id
+    select * from tb_order_sizetable_dtl where order_key='${body.po_size_tables[0].guid_key}' order by id
     `)
 
     // Edi status updated
 
-    string.Format(`UPDATE TbOrderEDI SET status=0,ConfirmDate=GETDATE() FROM TbOrderEDI A,(SELECT B.EdiOrderNo,B.ConsolidatedId FROM tb_order A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}') B WHERE A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId`, dyTbBean.TbOrderEDI, dyTbBean.TbOrder);
+    // const ediStatusUpdated = await sequelize.query(
+    //     `
+    //     UPDATE TbOrderEDI SET status=0,ConfirmDate=GETDATE() FROM tb_order_edi_temp A,(SELECT B.EdiOrderNo,B.ConsolidatedId FROM tb_order A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}') B WHERE A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId
+    //     `
+    // )
+
 
     //  Check that total page no. of artwork order, when the total page no. is null then updated the xml status is N, otherwise, updated it to Y
 
-    string.Format(`UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and ( SELECT count(b.Total_Page_No) cun FROM  tb_order A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and b.Total_Page_No is not null)>0`, dyTbBean.TbOrder);
+    // const checkArtworkPageNo = await sequelize.query(`
+    // UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and ( SELECT count(B.Total_Page_No) cun FROM  tb_order A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and B.Total_Page_No is not null)>0
+    // `)
 
     // send order email for confirm order if order status is confirm. reference to the SendArtworkEmail API
 
-
-
-
+    return body;
 
 
 }
