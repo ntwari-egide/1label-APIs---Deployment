@@ -152,8 +152,6 @@ const getCustomerDetails =  async (admin) => {
 }
 
 const getDisableInputPercentageStatus = async (guid_key,order_user) => {
-        
-    // let customerDetails = await getCustomerDetails(body.order_user)
 
     let disableInputPercentage = await sequelize.query(
         `select DisableInputPercentage from tb_translation where 1=1 and guid_key='${guid_key}'`
@@ -266,15 +264,24 @@ exports.SavePOOrder = async (body) => {
     
     let customerDetails = await getCustomerDetails(body.order_user)
 
-    // console.log('customer details: ', await customerDetails[0][0])
-
     // check if order_status is Confirm
     if(body.order_status === 'Confirm') body.order_status = new Date().toISOString()
 
     //--If the field ”DisableInputPercentage“ is Y indicates the unfilled percentage.
     let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
 
-    // console.log('Disabled details: ', await disableInputPercentage)
+    // SAVE POorder
+
+    let saveorder = await sequelize.query(`
+    insert into tb_order(guid_key, order_no, num, po_number, factory_code, order_expdate, invoice_cpyname, invoice_addr, invoice_email, invoice_contact, invoice_phone, invoice_fax, delivery_cpyname, delivery_addr, delivery_email, delivery_contact, delivery_phone, delivery_fax
+        , style_number, coo, season_code, colour, gender, remark, content_number, size_matrix_type1, size_content1, total_qty, artwork_number, brandid, order_user, order_date,is_draft
+        , A_Content_Number, B_Content_Number, C_Content_Number, invoice_addr2, invoice_addr3, delivery_city, delivery_country, delivery_post_code, delivery_addr2,delivery_addr3,size_pointer,LocationCode
+        ,SumPrice,ShrinkagePorcentaje,DraftOrderEmail,SizeTableImg,DefaultSizeContent,IsWastage
+        ,CustomerId,InvoiceAddressId,InvoiceContactId,DeliveryAddressId,DeliveryContactId)
+        values( '${body.guid_key}', '${body.order_no}', '${body.num}', '${body.po_number}', '${body.factory_code}', '${body.order_expdate_delivery_date}', '${body.invoice_address[0].invoice_cpyname}', '${body.invoice_address[0].invoice_addr}', '${body.invoice_address[0].invoice_email}', '${body.invoice_address[0].invoice_contact}', '${body.invoice_address[0].invoice_phone}', '${body.invoice_address[0].invoice_fax}', '${body.delivery_address[0].delivery_cpyname}', '${body.delivery_address[0].delivery_addr}', '${body.delivery_address[0].delivery_email}', '${body.delivery_address[0].delivery_contact}', '${body.delivery_address[0].delivery_phone}', '${body.delivery_address[0].delivery_fax}'
+        , '${body.contents[0].style_number}', '${body.coo}', '', '', '', '${body.remark}', '${body.contents[0].content_number}', '${body.po_size_tables[0].size_matrix_type}', '${body.po_size_tables[0].size_content}', ${body.total_qty}, '', '', '${body.order_user}', '${body.order_date}','N', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.invoice_address[0].invoice_addr2}', '${body.invoice_address[0].invoice_addr3}', '${body.delivery_address[0].delivery_city}', '${body.delivery_address[0].delivery_country}', '${body.delivery_address[0].delivery_post_code}', '${body.delivery_address[0].delivery_addr2}', '${body.delivery_address[0].delivery_addr3}',null,'${body.location_code}',${body.SumPrice},null,'${body.draft_order_email}',null,null,'${body.is_wastage}','','${body.invoice_address[0].invoice_address_id}','${body.invoice_address[0].invoice_contact_id}','${body.delivery_address[0].delivery_address_id}','${body.delivery_address[0].delivery_contact_id}')
+    `)
+
 
     // Return order line by order no.
 
