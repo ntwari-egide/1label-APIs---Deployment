@@ -259,6 +259,8 @@ exports.SendEmail = async (email, subject, body) => {
   console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   
 }
+
+
  
 exports.SavePOOrder = async (body) => {
     
@@ -330,7 +332,7 @@ values('${body.guid_key}', '${body.order_key}', '${body.brand_key}', '${body.po_
     select * from tb_order_sizetable_dtl where order_key='${body.po_size_tables[0].guid_key}' order by id
     `)
 
-    
+
 
     // update order api status
 
