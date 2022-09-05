@@ -283,6 +283,16 @@ exports.SavePOOrder = async (body) => {
     `)
 
 
+
+
+    // save poorder size table
+
+    const sizetable = await sequelize.query(`
+    insert into tb_asosorderposize(GuidKey, OrderKey, BrandId, EdiOrderNo, ConsolidatedId, SizeContent,SendDate, CreateDate)
+values('${body.guid_key}', '${body.order_key}', '${body.brand_key}', '${body.po_size_tables[0].edi_order_no}', '${body.po_size_tables[0].consolidated_id}', '${body.po_size_tables[0].size_content}','${body.po_size_tables[0].send_date}', '${body.po_size_tables[0].create_date}');
+`)
+
+
     // Return order line by order no.
 
     const orderLine = await getOrderLine(body.order_no);
@@ -319,6 +329,14 @@ exports.SavePOOrder = async (body) => {
     const sizeData = await sequelize.query(`
     select * from tb_order_sizetable_dtl where order_key='${body.po_size_tables[0].guid_key}' order by id
     `)
+
+    
+
+    // update order api status
+
+    const update = await sequelize.query(`
+    Update tb_order set OrderApiStatus='Y' where guid_key='${body.guid_key}'
+    `);
 
     // Edi status updated
 
