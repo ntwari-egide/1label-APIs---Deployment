@@ -156,7 +156,7 @@ const getDisableInputPercentageStatus = async (guid_key,order_user) => {
     // let customerDetails = await getCustomerDetails(body.order_user)
 
     let disableInputPercentage = await sequelize.query(
-        `select DisableInputPercentage from (Select * from tb_cust where admin='${order_user}') as data where 1=1 and guid_key='${guid_key}'`
+        `select DisableInputPercentage from tb_translation where 1=1 and guid_key='${guid_key}'`
     )
 
     return disableInputPercentage;
@@ -272,7 +272,7 @@ exports.SavePOOrder = async (body) => {
     if(body.order_status === 'Confirm') body.order_status = new Date().toISOString()
 
     //--If the field ”DisableInputPercentage“ is Y indicates the unfilled percentage.
-    // let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
+    let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
 
     // console.log('Disabled details: ', await disableInputPercentage)
 
