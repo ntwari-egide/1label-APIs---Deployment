@@ -315,18 +315,25 @@ exports.SavePOOrder = async (body) => {
 
     // Edi status updated
 
-    // const ediStatusUpdated = await sequelize.query(
-    //     `
-    //     UPDATE TbOrderEDI SET status=0,ConfirmDate=GETDATE() FROM tb_order_edi_temp A,(SELECT B.EdiOrderNo,B.ConsolidatedId FROM tb_order A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}') B WHERE A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId
-    //     `
-    // )
+    const ediStatusUpdated = await sequelize.query(
+        `
+        UPDATE 
+            tb_order_edi_Temp2 A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}'  
+        SET 
+            status=0,ConfirmDate=NOW()
+        WHERE
+            A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId;
+        `
+    )
 
 
     //  Check that total page no. of artwork order, when the total page no. is null then updated the xml status is N, otherwise, updated it to Y
 
-    // const checkArtworkPageNo = await sequelize.query(`
-    // UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and ( SELECT count(B.Total_Page_No) cun FROM  tb_order A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and B.Total_Page_No is not null)>0
-    // `)
+
+    const checkArtworkPageNo = await sequelize.query(`
+    UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and 
+    (SELECT cun FROM ( SELECT count(B.Total_Page_No) cun FROM  tb_order as A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and B.Total_Page_No is not null) AS N )>0;
+    `)
 
     // send order email for confirm order if order status is confirm. reference to the SendArtworkEmail API
 
