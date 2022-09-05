@@ -284,16 +284,12 @@ exports.SavePOOrder = async (body) => {
         , '${body.contents[0].style_number}', '${body.coo}', '', '', '', '${body.remark}', '${body.contents[0].content_number}', '${body.po_size_tables[0].size_matrix_type}', '${body.po_size_tables[0].size_content}', ${body.total_qty}, '', '', '${body.order_user}', '${body.order_date}','N', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.invoice_address[0].invoice_addr2}', '${body.invoice_address[0].invoice_addr3}', '${body.delivery_address[0].delivery_city}', '${body.delivery_address[0].delivery_country}', '${body.delivery_address[0].delivery_post_code}', '${body.delivery_address[0].delivery_addr2}', '${body.delivery_address[0].delivery_addr3}',null,'${body.location_code}',${body.SumPrice},null,'${body.draft_order_email}',null,null,'${body.is_wastage}','','${body.invoice_address[0].invoice_address_id}','${body.invoice_address[0].invoice_contact_id}','${body.delivery_address[0].delivery_address_id}','${body.delivery_address[0].delivery_contact_id}')
     `)
 
-
-
-
     // save poorder size table
 
     const sizetable = await sequelize.query(`
     insert into tb_asosorderposize(GuidKey, OrderKey, BrandId, EdiOrderNo, ConsolidatedId, SizeContent,SendDate, CreateDate)
 values('${body.guid_key}', '${body.order_key}', '${body.brand_key}', '${body.po_size_tables[0].edi_order_no}', '${body.po_size_tables[0].consolidated_id}', '${body.po_size_tables[0].size_content}','${body.po_size_tables[0].send_date}', '${body.po_size_tables[0].create_date}');
 `)
-
 
     // Return order line by order no.
 
