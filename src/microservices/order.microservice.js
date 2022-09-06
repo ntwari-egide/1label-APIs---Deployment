@@ -190,6 +190,16 @@ const getAPIlink = async (order_no, order) => {
     )
 }
 
+// create socket client to send data to server with multithreading
+
+const getSocketClient = async () => {
+    let socketClient = new WebSocket('ws://' + window.location.host + '/api/socket');
+
+    socketClient.onopen = () => {
+       
+        }
+    }
+
 const getOrderData = async () => {
 
     
@@ -260,7 +270,6 @@ exports.SendEmail = async (email, subject, body) => {
   
 }
 
-
  
 exports.SavePOOrder = async (body) => {
     
@@ -327,8 +336,6 @@ values('${body.guid_key}', '${body.order_key}', '${body.brand_key}', '${body.po_
     const sizeData = await sequelize.query(`
     select * from tb_order_sizetable_dtl where order_key='${body.po_size_tables[0].guid_key}' order by id
     `)
-
-
 
     // update order api status
 
