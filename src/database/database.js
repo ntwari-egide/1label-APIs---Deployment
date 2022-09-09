@@ -1,6 +1,10 @@
 const { Sequelize } = require('sequelize');
- const sequelize = new Sequelize('po_order', 'root', '12345', {
-        host: 'localhost',
+ const sequelize = new Sequelize(
+  'bznifnxhzmqpba3lt2z0', 
+  'bznifnxhzmqpba3lt2z0-mysql.services.clever-cloud.com', 
+  'kmj7ptgyKmRmxJacVpt8', 
+  {
+        host: 'bznifnxhzmqpba3lt2z0-mysql.services.clever-cloud.com',
         dialect: 'mysql',
         port: 3306
       });
