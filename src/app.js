@@ -53,14 +53,14 @@
      },
    },
    servers: [
+    //  {
+    //    url: 'http://localhost:10000',
+    //    description: 'Development server',
+    //  },
      {
-       url: 'http://localhost:10000',
-       description: 'Development server',
+       url: 'https://po-order-apis.herokuapp.com',
+       description: 'Production server',
      },
-     // {
-     //   url: 'https://po-order-apis.herokuapp.com',
-     //   description: 'Development server',
-     // },
    ],
    components: {
      securitySchemes: {
