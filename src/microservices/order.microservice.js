@@ -1,7 +1,6 @@
 const { QueryTypes, Sequelize } = require('sequelize');
 const { sequelize } = require("../utils/dbConnection");
-
-
+const nodemailer = require("nodemailer");
 
 
 exports.addPOOrder = async (brand_key, order_user, order_keys) => {
@@ -153,11 +152,9 @@ const getCustomerDetails =  async (admin) => {
 }
 
 const getDisableInputPercentageStatus = async (guid_key,order_user) => {
-        
-    // let customerDetails = await getCustomerDetails(body.order_user)
 
     let disableInputPercentage = await sequelize.query(
-        `select DisableInputPercentage from (Select * from tb_cust where admin='${order_user}') as data where 1=1 and guid_key='${guid_key}'`
+        `select DisableInputPercentage from tb_translation where 1=1 and guid_key='${guid_key}'`
     )
 
     return disableInputPercentage;
@@ -193,6 +190,16 @@ const getAPIlink = async (order_no, order) => {
     )
 }
 
+// create socket client to send data to server with multithreading
+
+const getSocketClient = async () => {
+    let socketClient = new WebSocket('ws://' + window.location.host + '/api/socket');
+
+    socketClient.onopen = () => {
+       
+        }
+    }
+
 const getOrderData = async () => {
 
     
@@ -227,20 +234,71 @@ const getOrderData = async () => {
     order_no=@order_no order by o.num", dyTbBean.TbOrder, dyTbBean.TbZContent, itemSql)
     `)
 }
+
+// send email to ntwariegide2@gmail.com
+
+exports.SendEmail = async (email, subject, body) => {
+     // Generate test SMTP service account from ethereal.email
+  // Only needed if you don't have a real mail account for testing
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
+  });
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    to: "bar@example.com, baz@example.com", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  
+}
+
  
 exports.SavePOOrder = async (body) => {
     
     let customerDetails = await getCustomerDetails(body.order_user)
 
-    // console.log('customer details: ', await customerDetails[0][0])
-
     // check if order_status is Confirm
     if(body.order_status === 'Confirm') body.order_status = new Date().toISOString()
 
     //--If the field ”DisableInputPercentage“ is Y indicates the unfilled percentage.
-    // let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
+    let disableInputPercentage = await getDisableInputPercentageStatus(body.guid_key, body.order_user)
 
-    // console.log('Disabled details: ', await disableInputPercentage)
+    // SAVE POorder
+
+    let saveorder = await sequelize.query(`
+    insert into tb_order(guid_key, order_no, num, po_number, factory_code, order_expdate, invoice_cpyname, invoice_addr, invoice_email, invoice_contact, invoice_phone, invoice_fax, delivery_cpyname, delivery_addr, delivery_email, delivery_contact, delivery_phone, delivery_fax
+        , style_number, coo, season_code, colour, gender, remark, content_number, size_matrix_type1, size_content1, total_qty, artwork_number, brandid, order_user, order_date,is_draft
+        , A_Content_Number, B_Content_Number, C_Content_Number, invoice_addr2, invoice_addr3, delivery_city, delivery_country, delivery_post_code, delivery_addr2,delivery_addr3,size_pointer,LocationCode
+        ,SumPrice,ShrinkagePorcentaje,DraftOrderEmail,SizeTableImg,DefaultSizeContent,IsWastage
+        ,CustomerId,InvoiceAddressId,InvoiceContactId,DeliveryAddressId,DeliveryContactId)
+        values( '${body.guid_key}', '${body.order_no}', '${body.num}', '${body.po_number}', '${body.factory_code}', '${body.order_expdate_delivery_date}', '${body.invoice_address[0].invoice_cpyname}', '${body.invoice_address[0].invoice_addr}', '${body.invoice_address[0].invoice_email}', '${body.invoice_address[0].invoice_contact}', '${body.invoice_address[0].invoice_phone}', '${body.invoice_address[0].invoice_fax}', '${body.delivery_address[0].delivery_cpyname}', '${body.delivery_address[0].delivery_addr}', '${body.delivery_address[0].delivery_email}', '${body.delivery_address[0].delivery_contact}', '${body.delivery_address[0].delivery_phone}', '${body.delivery_address[0].delivery_fax}'
+        , '${body.contents[0].style_number}', '${body.coo}', '', '', '', '${body.remark}', '${body.contents[0].content_number}', '${body.po_size_tables[0].size_matrix_type}', '${body.po_size_tables[0].size_content}', ${body.total_qty}, '', '', '${body.order_user}', '${body.order_date}','N', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.contents[0].content_number}', '${body.invoice_address[0].invoice_addr2}', '${body.invoice_address[0].invoice_addr3}', '${body.delivery_address[0].delivery_city}', '${body.delivery_address[0].delivery_country}', '${body.delivery_address[0].delivery_post_code}', '${body.delivery_address[0].delivery_addr2}', '${body.delivery_address[0].delivery_addr3}',null,'${body.location_code}',${body.SumPrice},null,'${body.draft_order_email}',null,null,'${body.is_wastage}','','${body.invoice_address[0].invoice_address_id}','${body.invoice_address[0].invoice_contact_id}','${body.delivery_address[0].delivery_address_id}','${body.delivery_address[0].delivery_contact_id}')
+    `)
+
+    // save poorder size table
+
+    const sizetable = await sequelize.query(`
+    insert into tb_asosorderposize(GuidKey, OrderKey, BrandId, EdiOrderNo, ConsolidatedId, SizeContent,SendDate, CreateDate)
+values('${body.guid_key}', '${body.order_key}', '${body.brand_key}', '${body.po_size_tables[0].edi_order_no}', '${body.po_size_tables[0].consolidated_id}', '${body.po_size_tables[0].size_content}','${body.po_size_tables[0].send_date}', '${body.po_size_tables[0].create_date}');
+`)
 
     // Return order line by order no.
 
@@ -263,36 +321,53 @@ exports.SavePOOrder = async (body) => {
 
     //  item ref setting
 
-    const itemRefSetting = await sequelize.query(`
-    select layout_file,guid_key
-,is_nonsize --non size item
-,wastage=case when isnull(hasqr,'N')='Y' then ROUND(CAST(isnull(wastage,0) as float)/100, 2) else 0 end
-,enablePrint --enable direct print
-,EnableDPPDFBySize -- enable artwork pdf by size
-,ArtworkItemType=case when isnull(hasqr,'N')='Y' then 'QR' when isnull(EnableArtworkBarcode,'N')='Y' then 'Barcode' else 'Normal' end,ArtworkLabel
-from tb_item_reference where 1=1
-and item_ref='${body.item_ref}';
+    const itemRefSetting = await sequelize.query(`select layout_file,guid_key
+    ,is_nonsize
+    ,wastage=case when isnull(hasqr)='Y' then ROUND(CAST(isnull(wastage) as float)/100, 2) else 0 end
+    ,enablePrint
+    ,EnableDPPDFBySize
+    ,case when isnull(hasqr)='Y' then 'QR' when isnull(EnableArtworkBarcode)='Y' then 'Barcode' else 'Normal' end as ArtworkItemType,ArtworkLabel
+    from tb_item_reference where 1=1
+    and item_ref='${body.item_ref[0].item_ref}';
     `)
 
     // size data for order
 
     const sizeData = await sequelize.query(`
-    select * from TbOrderSizeTableDtl where order_key='${body.guid_no}' order by id
+    select * from tb_order_sizetable_dtl where order_key='${body.po_size_tables[0].guid_key}' order by id
     `)
+
+    // update order api status
+
+    const update = await sequelize.query(`
+    Update tb_order set OrderApiStatus='Y' where guid_key='${body.guid_key}'
+    `);
 
     // Edi status updated
 
-    string.Format(`UPDATE TbOrderEDI SET status=0,ConfirmDate=GETDATE() FROM TbOrderEDI A,(SELECT B.EdiOrderNo,B.ConsolidatedId FROM tb_order A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}') B WHERE A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId`, dyTbBean.TbOrderEDI, dyTbBean.TbOrder);
+    const ediStatusUpdated = await sequelize.query(
+        `
+        UPDATE 
+            tb_order_edi_Temp2 A INNER JOIN tb_asosorderposize B ON A.guid_key=B.OrderKey AND A.order_no='${body.order_no}'  
+        SET 
+            status=0,ConfirmDate=NOW()
+        WHERE
+            A.order_no=B.EdiOrderNo AND A.Consolidated_ID=B.ConsolidatedId;
+        `
+    )
+
 
     //  Check that total page no. of artwork order, when the total page no. is null then updated the xml status is N, otherwise, updated it to Y
 
-    string.Format(`UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and ( SELECT count(b.Total_Page_No) cun FROM  tb_order A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and b.Total_Page_No is not null)>0`, dyTbBean.TbOrder);
+
+    const checkArtworkPageNo = await sequelize.query(`
+    UPDATE tb_order SET AwXmlStatus='Y' WHERE order_no='${body.order_no}' and 
+    (SELECT cun FROM ( SELECT count(B.Total_Page_No) cun FROM  tb_order as A LEFT JOIN tb_auto_artwork B ON A.guid_key=B.Order_Key WHERE A.order_no='${body.order_no}' and B.Total_Page_No is not null) AS N )>0;
+    `)
 
     // send order email for confirm order if order status is confirm. reference to the SendArtworkEmail API
 
-    
-
-
+    return body;
 
 
 }
